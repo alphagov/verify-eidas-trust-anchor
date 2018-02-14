@@ -6,7 +6,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.interfaces.RSAPrivateKey;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -17,7 +16,7 @@ import uk.gov.ida.trustanchor.Generator;
 
 abstract class SigningCommand {
   @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")
-  private List<File> inputFiles = Collections.emptyList();
+  private List<File> inputFiles;
 
   @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = true)
   private File outputFile;
