@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
+    }
+    dependencies {
+        classpath 'org.gradle.plugins:gradle-compass:1.0.7',
+                  'uk.gov.ida:ida-gradle:1.1.0-15',
+                  'com.github.ben-manes:gradle-versions-plugin:0.11.3'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idaJar'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'application'
+
+mainClassName = 'uk.gov.ida.trustanchor.cli.Application'
+
+repositories {
+    maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
+}
+
+dependencies {
+    compile 'com.nimbusds:nimbus-jose-jwt:4.0',
+            'info.picocli:picocli:2.2.2'
+}
+
+task copyToLib(dependsOn: jar, type: Copy) {
+    into "$buildDir/output/lib"
+    from configurations.runtime
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+}
