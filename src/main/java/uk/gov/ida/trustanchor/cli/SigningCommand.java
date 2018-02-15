@@ -3,6 +3,7 @@ package uk.gov.ida.trustanchor.cli;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.security.interfaces.RSAPrivateKey;
@@ -18,7 +19,7 @@ abstract class SigningCommand {
   @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")
   private List<File> inputFiles;
 
-  @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = true)
+  @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = false)
   private File outputFile;
 
   public Void build(RSAPrivateKey key) throws Exception {
@@ -28,7 +29,7 @@ abstract class SigningCommand {
       throw new FileNotFoundException("Could not read files: " + missingFiles);
     }
 
-    if (! (outputFile.canWrite() || (!outputFile.exists() && outputFile.getAbsoluteFile().getParentFile().canWrite()))) {
+    if (outputFile != null && !(outputFile.canWrite() || (!outputFile.exists() && outputFile.getAbsoluteFile().getParentFile().canWrite()))) {
       throw new FileNotFoundException("Cannot write to output file: " + outputFile.getAbsolutePath());
     }
 
@@ -36,7 +37,7 @@ abstract class SigningCommand {
     final Generator generator = new Generator(key);
     final String generatedAnchors = generator.generate(inputs);
 
-    final FileWriter output = new FileWriter(outputFile);
+    final OutputStreamWriter output = (outputFile == null ? new OutputStreamWriter(System.out) : new FileWriter(outputFile));
     output.write(generatedAnchors);
     output.close();
 
