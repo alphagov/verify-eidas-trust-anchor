@@ -2,9 +2,8 @@ package uk.gov.ida.trustanchor;
 
 import java.security.PrivateKey;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
@@ -18,24 +17,20 @@ public class Generator {
     this.signer = new JWKSetSigner(signingKey, null);
   }
 
-  public String generate(Stream<String> inputFiles) throws JOSEException {
+  public String generate(List<String> inputFiles) throws JOSEException, ParseException {
     return generateJson(inputFiles).serialize();
   }
 
-  public JWSObject generateJson(Stream<String> inputFiles) throws JOSEException {
-    List<JWK> certs = inputFiles.map(this::makeJWK).collect(Collectors.toList());
+  public JWSObject generateJson(List<String> inputFiles) throws JOSEException, ParseException {
+    List<JWK> certs = new ArrayList<JWK>();
+    for (String input : inputFiles) {
+      certs.add(CountryTrustAnchor.parse(input));
+    }
+
     JWKSet certSet = new JWKSet(certs);
 
     JWSObject signedCerts = signer.sign(certSet);
 
     return signedCerts;
-  }
-
-  public JWK makeJWK(String yaml) {
-    try {
-      return JWK.parse(yaml);
-    } catch (ParseException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

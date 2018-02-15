@@ -4,10 +4,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.security.PrivateKey;
-import java.security.interfaces.RSAPrivateKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,7 +33,10 @@ abstract class SigningCommand {
       throw new FileNotFoundException("Cannot write to output file: " + outputFile.getAbsolutePath());
     }
 
-    Stream<String> inputs = inputFiles.stream().map(this::readFile);
+    List<String> inputs = new ArrayList<>(inputFiles.size());
+    for (File input : inputFiles) {
+      inputs.add(new String(Files.readAllBytes(input.toPath())));
+    }
     final Generator generator = new Generator(key);
     final String generatedAnchors = generator.generate(inputs);
 
@@ -43,13 +45,5 @@ abstract class SigningCommand {
     output.close();
 
     return null;
-  }
-
-  private String readFile(File file) {
-    try {
-      return new String(Files.readAllBytes(file.toPath()));
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
