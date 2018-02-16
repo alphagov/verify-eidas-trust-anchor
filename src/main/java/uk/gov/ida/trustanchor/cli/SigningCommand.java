@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.security.PrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ abstract class SigningCommand {
   @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = false)
   private File outputFile;
 
-  public Void build(RSAPrivateKey key) throws Exception {
+  public Void build(PrivateKey key) throws Exception {
     Stream<File> nonReadable = inputFiles.stream().filter(f -> !f.canRead());
     if (nonReadable.count() != 0) {
       String missingFiles = nonReadable.map(File::getPath).collect(Collectors.joining());

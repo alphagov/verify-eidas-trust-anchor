@@ -1,6 +1,6 @@
 package uk.gov.ida.trustanchor;
 
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
 import java.text.ParseException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 public class Generator {
   private final JWKSetSigner signer;
 
-  public Generator(RSAPrivateKey signingKey) {
+  public Generator(PrivateKey signingKey) {
     this.signer = new JWKSetSigner(signingKey, null);
   }
 

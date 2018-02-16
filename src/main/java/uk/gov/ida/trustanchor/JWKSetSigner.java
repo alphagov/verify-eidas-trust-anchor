@@ -9,14 +9,15 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.util.Base64URL;
-import java.security.interfaces.RSAPrivateKey;
+
+import java.security.PrivateKey;
 
 class JWKSetSigner {
 
   private final Base64URL thumbprint;
-  private final RSAPrivateKey privateKey;
+  private final PrivateKey privateKey;
 
-  public JWKSetSigner(RSAPrivateKey privateKey, Base64URL thumbprint) {
+  public JWKSetSigner(PrivateKey privateKey, Base64URL thumbprint) {
     this.privateKey = privateKey;
     this.thumbprint = thumbprint;
   }

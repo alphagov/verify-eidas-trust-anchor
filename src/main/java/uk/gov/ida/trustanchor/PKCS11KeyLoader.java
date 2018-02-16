@@ -9,9 +9,9 @@ import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.UnrecoverableEntryException;
-import java.security.interfaces.RSAPrivateKey;
 
 /**
  * Partially cribbed from net.shibboleth.tool.xmlsectool.CredentialHelper
@@ -29,18 +29,19 @@ public class PKCS11KeyLoader {
     this.keyPassword = keyPassword;
   }
 
-  public RSAPrivateKey getSigningKey() throws ClassNotFoundException, NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException, NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, FileNotFoundException, IOException {
+  public PrivateKey getSigningKey() throws NoSuchAlgorithmException, UnrecoverableEntryException, KeyStoreException,
+          NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, CertificateException {
     final KeyStore keyStore = getKeyStore(this.pkcs11Config, this.provider);
 
     final PrivateKeyEntry keyEntry = (PrivateKeyEntry)keyStore.getEntry(keyAlias,
       new KeyStore.PasswordProtection(keyPassword.toCharArray()));
     if (keyEntry == null) {
-      throw new RuntimeException("Key store contains wrong kind of credential, need RSA private key");
+      throw new RuntimeException("Key store contains wrong kind of credential, need Private key");
     }
 
-    RSAPrivateKey privateKey = (RSAPrivateKey)keyEntry.getPrivateKey();
+    PrivateKey privateKey = keyEntry.getPrivateKey();
     if (privateKey == null) {
-      throw new RuntimeException("Key store contains wrong kind of private key, need RSA private key");
+      throw new RuntimeException("Key store didn't contain Private Key");
     }
 
     return privateKey;

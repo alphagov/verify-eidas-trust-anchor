@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.nimbusds:nimbus-jose-jwt:4.0',
+    compile 'com.nimbusds:nimbus-jose-jwt:5.4',
             'info.picocli:picocli:2.2.2'
 }
 

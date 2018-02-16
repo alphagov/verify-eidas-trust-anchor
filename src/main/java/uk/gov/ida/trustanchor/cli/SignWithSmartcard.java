@@ -1,7 +1,7 @@
 package uk.gov.ida.trustanchor.cli;
 
 import java.io.File;
-import java.security.interfaces.RSAPrivateKey;
+import java.security.PrivateKey;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine.Command;
@@ -25,7 +25,7 @@ public class SignWithSmartcard extends SigningCommand implements Callable<Void> 
   @Override
   public Void call() throws Exception {
     final String config = String.format("--\nname=%s\nlibrary=%s", name, library.getAbsolutePath());
-    RSAPrivateKey key = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, config, alias, password).getSigningKey();
+    PrivateKey key = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, config, alias, password).getSigningKey();
 
     return build(key);
   }
