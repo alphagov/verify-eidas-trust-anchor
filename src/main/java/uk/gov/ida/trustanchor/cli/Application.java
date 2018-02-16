@@ -4,7 +4,10 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.RunLast;
 
-@Command(name="tasign", description="Signs trust anchors", subcommands={SignWithFile.class, SignWithSmartcard.class})
+@Command(name="tasign", description="Signs trust anchors", subcommands={
+  Import.class,
+  SignWithFile.class,
+  SignWithSmartcard.class})
 class Application implements Runnable {
   public static void main(String[] args) {
     CommandLine cmd = new CommandLine(new Application());
@@ -13,6 +16,8 @@ class Application implements Runnable {
 
   @Override
   public void run() {
+    // If we reach this point, we didn't match any subcommands.
+    // So print the usage; there's nothing to do by default.
     CommandLine.usage(this, System.err);
   }
 }
