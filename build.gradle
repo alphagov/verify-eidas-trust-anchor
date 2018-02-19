@@ -25,8 +25,13 @@ dependencies {
     compile 'com.nimbusds:nimbus-jose-jwt:5.4',
             'info.picocli:picocli:2.2.2'
 
-    testCompile "uk.gov.ida:security-utils:2.0.0-317",
-                'uk.gov.ida:ida-dev-pki:1.1.0-20'
+    testCompile 'uk.gov.ida:security-utils:2.0.0-317',
+                'uk.gov.ida:ida-dev-pki:1.1.0-20',
+                'org.junit.jupiter:junit-jupiter-api:5.0.0'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 task copyToLib(dependsOn: jar, type: Copy) {
