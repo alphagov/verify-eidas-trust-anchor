@@ -2,6 +2,11 @@ package uk.gov.ida.trustanchor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.SignatureException;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -12,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 
+import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyOperation;
@@ -50,7 +56,7 @@ public class CountryTrustAnchor {
 
     Collection<String> errors = findErrors(key);
     if (!errors.isEmpty()) {
-      throw new RuntimeException(String.format("JWK was not a valid trust anchor: %s", String.join(", ", errors)));
+      throw new ParseException(String.format("JWK was not a valid trust anchor: %s", String.join(", ", errors)), 0);
     }
 
     return key;
@@ -58,22 +64,27 @@ public class CountryTrustAnchor {
 
   public static Collection<String> findErrors(JWK anchor) {
     Collection<String> errors = new HashSet<String>();
-    if (!anchor.getKeyType().equals(KeyType.RSA))
+    if (anchor.getKeyType() == null || !anchor.getKeyType().equals(KeyType.RSA))
       errors.add(String.format("Expecting key type to be %s, was %s", KeyType.RSA, anchor.getKeyType()));
-    if (!anchor.getAlgorithm().equals(JWSAlgorithm.RS256))
+    if (anchor.getAlgorithm() == null || !anchor.getAlgorithm().equals(JWSAlgorithm.RS256))
       errors.add(String.format("Expecting algorithm to be %s, was %s", JWSAlgorithm.RS256, anchor.getAlgorithm()));
-    if (anchor.getKeyOperations().size() != 1 || !anchor.getKeyOperations().contains(KeyOperation.VERIFY))
+    if (anchor.getKeyOperations() == null || anchor.getKeyOperations().size() != 1 || !anchor.getKeyOperations().contains(KeyOperation.VERIFY))
       errors.add(String.format("Expecting key operations to only contain %s", KeyOperation.VERIFY));
-    if (anchor.getX509CertChain().size() != 1)
+    if (anchor.getKeyID() == null || anchor.getKeyID().isEmpty())
+      errors.add(String.format("Expecting a KeyID"));
+    if (anchor.getX509CertChain() == null || anchor.getX509CertChain().size() != 1) {
       errors.add(String.format("Expecting exactly one X.509 certificate"));
-
-    InputStream certStream = new ByteArrayInputStream(anchor.getX509CertChain().get(0).decode());
-    try {
-      CertificateFactory.getInstance("X.509").generateCertificate(certStream);
-    } catch (CertificateException e) {
-      errors.add(String.format("Expecting a valid X.509 certificate: %s", e.getMessage()));
+    } else {
+      InputStream certStream = new ByteArrayInputStream(anchor.getX509CertChain().get(0).decode());
+      try {
+        Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(certStream);
+        certificate.verify(((RSAKey)anchor).toPublicKey());
+      } catch (CertificateException e) {
+        errors.add(String.format("Expecting a valid X.509 certificate: %s", e.getMessage()));
+      } catch (NoSuchAlgorithmException | JOSEException | SignatureException | NoSuchProviderException | InvalidKeyException e) {
+        errors.add(String.format("Could not verify certificate: %s", e.getMessage()));
+      }
     }
-
     return errors;
   }
 }
