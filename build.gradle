@@ -14,8 +14,10 @@ apply plugin: 'idaJar'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'application'
+apply plugin: 'maven-publish'
 
 mainClassName = 'uk.gov.ida.trustanchor.cli.Application'
+version = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
 
 repositories {
     maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
@@ -46,4 +48,28 @@ jar {
         attributes 'Main-Class': mainClassName
     }
     from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+}
+
+publishing {
+    repositories {
+        maven {
+            url '/srv/maven'
+        }
+    }
+
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = 'uk.gov.ida'
+            artifactId = 'trust-anchor'
+
+            artifact sourceJar {
+                classifier 'sources'
+            }
+        }
+    }
 }
