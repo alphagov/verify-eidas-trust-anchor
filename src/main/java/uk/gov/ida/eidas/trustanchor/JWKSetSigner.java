@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor;
+package uk.gov.ida.eidas.trustanchor;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;

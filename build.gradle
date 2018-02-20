@@ -16,7 +16,7 @@ apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
 
-mainClassName = 'uk.gov.ida.trustanchor.cli.Application'
+mainClassName = 'uk.gov.ida.eidas.trustanchor.cli.Application'
 version = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
 
 repositories {
@@ -64,7 +64,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            groupId = 'uk.gov.ida'
+            groupId = 'uk.gov.ida.eidas'
             artifactId = 'trust-anchor'
 
             artifact sourceJar {

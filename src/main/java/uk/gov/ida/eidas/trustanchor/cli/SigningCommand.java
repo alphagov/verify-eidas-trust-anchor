@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor.cli;
+package uk.gov.ida.eidas.trustanchor.cli;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import uk.gov.ida.trustanchor.Generator;
+import uk.gov.ida.eidas.trustanchor.Generator;
 
 abstract class SigningCommand {
   @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")

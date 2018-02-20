@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor.cli;
+package uk.gov.ida.eidas.trustanchor.cli;
 
 import java.io.File;
 import java.security.PrivateKey;
@@ -6,7 +6,7 @@ import java.util.concurrent.Callable;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import uk.gov.ida.trustanchor.PKCS11KeyLoader;
+import uk.gov.ida.eidas.trustanchor.PKCS11KeyLoader;
 
 @Command(name="sign-with-smartcard", description="Signs the final key set with a key from a smartcard")
 public class SignWithSmartcard extends SigningCommand implements Callable<Void> {

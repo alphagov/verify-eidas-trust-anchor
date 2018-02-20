@@ -64,7 +64,7 @@ This requires an external native library, such as [OpenSC](https://github.com/op
 
 If you think you have discovered a security issue in this code please email [disclosure@digital.cabinet-office.gov.uk](mailto:disclosure@digital.cabinet-office.gov.uk) with details.
 
-For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-trust-anchor/issues/new) in the GitHub issue tracker.
+For non-security related bugs and feature requests please [raise an issue](https://github.com/alphagov/verify-eidas-trust-anchor/issues/new) in the GitHub issue tracker.
 
 ## Licence
 

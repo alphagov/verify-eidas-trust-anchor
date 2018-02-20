@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor.cli;
+package uk.gov.ida.eidas.trustanchor.cli;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;

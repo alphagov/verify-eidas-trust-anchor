@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor;
+package uk.gov.ida.eidas.trustanchor;
 
 import java.security.PrivateKey;
 import java.text.ParseException;

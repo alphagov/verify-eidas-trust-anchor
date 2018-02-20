@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor.cli;
+package uk.gov.ida.eidas.trustanchor.cli;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -10,8 +10,8 @@ import com.nimbusds.jose.jwk.JWK;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import uk.gov.ida.trustanchor.FileKeyLoader;
-import uk.gov.ida.trustanchor.CountryTrustAnchor;
+import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
+import uk.gov.ida.eidas.trustanchor.CountryTrustAnchor;
 
 @Command(name="import", description="Import a certificate file and generate a JWK from it")
 class Import implements Callable<Void> {

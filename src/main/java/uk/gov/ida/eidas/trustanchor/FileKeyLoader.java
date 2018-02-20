@@ -1,4 +1,4 @@
-package uk.gov.ida.trustanchor;
+package uk.gov.ida.eidas.trustanchor;
 
 import java.io.File;
 import java.io.FileInputStream;
