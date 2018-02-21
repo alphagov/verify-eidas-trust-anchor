@@ -1,5 +1,5 @@
-Verify Trust Anchor Generator
-=============================
+Verify eIDAS Trust Anchor Generator
+===================================
 
 [European identity schemes](https://ec.europa.eu/digital-single-market/en/e-identification) each have their own metadata which contains the scheme's identity providers and public keys. Each metadata file is signed with a key specific to each country which allows consumers of the metadata to trust its authenticity.
 
