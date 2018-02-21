@@ -2,6 +2,7 @@ package uk.gov.ida.eidas.trustanchor;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
 import net.minidev.json.JSONObject;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -48,7 +50,7 @@ public class GeneratorTest {
 
         JWSObject output = generator.generateJson(files);
 
-        assertSigned(output);
+        assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
         assertTrue(((List<Object>)output.getPayload().toJSONObject().get("keys")).isEmpty());
     }
@@ -59,7 +61,7 @@ public class GeneratorTest {
         files.add(createJsonObject().toJSONString());
         JWSObject output = generator.generateJson(files);
 
-        assertSigned(output);
+        assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
 
         List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
@@ -74,7 +76,7 @@ public class GeneratorTest {
         for (String attribute : valueList){
             JSONObject invalid = createJsonObject();
             invalid.remove(attribute);
-            assertThrows(ParseException.class, () -> generator.generateJson(Collections.singletonList(invalid.toJSONString())), "Expected required: " + attribute);
+            assertThrows(ParseException.class, () -> generator.generateJson(Collections.singletonList(invalid.toJSONString())));
         }
     }
 
@@ -111,25 +113,6 @@ public class GeneratorTest {
     }
 
     @Test
-    public void shouldHandleTwoStrings() throws ParseException, JOSEException {
-        List<String> files = new ArrayList<>();
-        files.add(createJsonObject("https://1.generator.test").toJSONString());
-        files.add(createJsonObject("https://2.generator.test").toJSONString());
-
-        JWSObject output = generator.generateJson(files);
-
-        assertSigned(output);
-        assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
-
-        List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
-        Set<String> kidSet = keys.stream().map(x -> x.getAsString("kid")).collect(Collectors.toSet());
-
-        assertEquals(2, kidSet.size());
-        assertTrue(kidSet.contains("https://1.generator.test"));
-        assertTrue(kidSet.contains("https://2.generator.test"));
-    }
-
-    @Test
     public void shouldThrowOnOneInvalidKey() {
         List<String> files = new ArrayList<>();
         files.add(createJsonObject("https://1.generator.test").toJSONString());
@@ -143,19 +126,19 @@ public class GeneratorTest {
     @Test
     public void shouldHandleMultipleStrings() throws ParseException, JOSEException {
         List<String> files = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 1024; i++) {
             files.add(createJsonObject(String.format("https://%d.generator.test", i)).toJSONString());
         }
         JWSObject output = generator.generateJson(files);
 
-        assertSigned(output);
+        assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
 
         List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
         Set<String> kidSet = keys.stream().map(x -> x.getAsString("kid")).collect(Collectors.toSet());
 
-        assertEquals(100, kidSet.size());
-        for (int i = 0; i < 100; i++) {
+        assertEquals(1024, kidSet.size());
+        for (int i = 0; i < 1024; i++) {
             assertTrue(kidSet.contains(String.format("https://%d.generator.test", i)));
         }
     }
@@ -177,10 +160,11 @@ public class GeneratorTest {
         return jsonObject;
     }
 
-    private void assertSigned(JWSObject output){
+    private void assertSigned(JWSObject output, RSAPublicKey signedKey) throws JOSEException {
         assertEquals(JWSObject.State.SIGNED, output.getState());
         assertNotNull(output.getSignature());
         assertNotEquals("", output.getSignature().decodeToString());
+        assertTrue(output.verify(new RSASSAVerifier(signedKey)));
     }
 
 }
