@@ -31,8 +31,8 @@ public class CountryTrustAnchor {
     if (publicKey == null) {
       throw new RuntimeException(String.format(
         "Certificate public key in wrong format, got %s, expecting %s",
-        RSAPublicKey.class.getName(),
-        certificate.getPublicKey().getClass().getName()));
+        certificate.getPublicKey().getClass().getName(),
+        RSAPublicKey.class.getName()));
     }
 
     Base64 base64cert = Base64.encode(certificate.getEncoded());
