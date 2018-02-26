@@ -6,3 +6,4 @@ build/
 .project
 .idea/
 verify-eidas-trust-anchor.iml
+out/

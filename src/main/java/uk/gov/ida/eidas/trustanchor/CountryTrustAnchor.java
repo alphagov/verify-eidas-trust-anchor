@@ -27,7 +27,7 @@ import com.nimbusds.jose.util.Base64;
 
 public class CountryTrustAnchor {
   public static JWK make(X509Certificate certificate, String keyId) throws CertificateEncodingException {
-    RSAPublicKey publicKey = (RSAPublicKey)certificate.getPublicKey();
+    RSAPublicKey publicKey = (RSAPublicKey) certificate.getPublicKey();
     if (publicKey == null) {
       throw new RuntimeException(String.format(
         "Certificate public key in wrong format, got %s, expecting %s",
@@ -78,11 +78,13 @@ public class CountryTrustAnchor {
       InputStream certStream = new ByteArrayInputStream(anchor.getX509CertChain().get(0).decode());
       try {
         Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(certStream);
-        certificate.verify(((RSAKey)anchor).toPublicKey());
+        if(!certificate.getPublicKey().equals(((RSAKey)anchor).toPublicKey())) {
+          errors.add(String.format("X.509 Certificate does not match the public key"));
+        }
       } catch (CertificateException e) {
-        errors.add(String.format("Expecting a valid X.509 certificate: %s", e.getMessage()));
-      } catch (NoSuchAlgorithmException | JOSEException | SignatureException | NoSuchProviderException | InvalidKeyException e) {
-        errors.add(String.format("Could not verify certificate: %s", e.getMessage()));
+        errors.add(String.format("X.509 certificate factory not available", e.getMessage()));
+      } catch (JOSEException e) {
+        errors.add(String.format("Error getting public key from trust anchor", e.getMessage()));
       }
     }
     return errors;

@@ -2,6 +2,7 @@ package uk.gov.ida.eidas.trustanchor.cli;
 
 import java.io.File;
 import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.concurrent.Callable;
 
 import picocli.CommandLine.Command;
@@ -17,16 +18,20 @@ public class SignWithSmartcard extends SigningCommand implements Callable<Void> 
   private String name;
 
   @Option(names = { "--key" }, description = "Alias of the key on the smartcard", required=true)
-  private String alias;
+  private String keyAlias;
 
   @Option(names = { "--password" }, description = "Password of the key on the smartcard", required=true)
   private String password;
 
+  @Option(names = { "--cert" }, description = "Alias of the public certificate on the smartcard", required=true)
+  private String certAlias;
+
   @Override
   public Void call() throws Exception {
     final String config = String.format("--\nname=%s\nlibrary=%s", name, library.getAbsolutePath());
-    PrivateKey key = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, config, alias, password).getSigningKey();
-
-    return build(key);
+    PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, config, password);
+    PrivateKey key = keyLoader.getSigningKey(keyAlias);
+    X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
+    return build(key, certificate);
   }
 }

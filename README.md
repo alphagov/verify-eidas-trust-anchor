@@ -44,7 +44,7 @@ Generates a country's trust anchor by supplying its certificate and the location
 
 Aggregates and signs a collection of trust anchors by using a RSA private key supplied by a file. You can specify as many trust anchors as desired, including none.
 
-    ... sign-with-file --key path/to/private-key.pk8 [country1.jwk [country2.jwk [...]]]
+    ... sign-with-file --key path/to/private-key.pk8 --cert path/to/public-cert.crt [country1.jwk [country2.jwk [...]]]
 
 ### Sign with smartcard
 
@@ -53,7 +53,8 @@ Aggregates and signs a collection of trust anchors by using a smartcard (such as
     ... sign-with-smartcard \
       --lib path/to/smartcard-lib.so \
       --symbol smartcard-lib-name \
-      --key "Certificate for Digital Signature" \
+      --key "Private Key alias" \
+      --cert "Public Certificate alias" \
       --password 12345
 
 This requires an external native library, such as [OpenSC](https://github.com/opensc/opensc). The library path and symbol will [passed to the PKCS11 provider as configuration](https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html#P11Provider). For OpenSC, the correct choices might be:
