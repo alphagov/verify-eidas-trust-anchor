@@ -72,8 +72,8 @@ public class CountryTrustAnchor {
       errors.add(String.format("Expecting key operations to only contain %s", KeyOperation.VERIFY));
     if (anchor.getKeyID() == null || anchor.getKeyID().isEmpty())
       errors.add(String.format("Expecting a KeyID"));
-    if (anchor.getX509CertChain() == null || anchor.getX509CertChain().size() != 1) {
-      errors.add(String.format("Expecting exactly one X.509 certificate"));
+    if (anchor.getX509CertChain() == null || anchor.getX509CertChain().size() == 0) {
+      errors.add(String.format("Expecting at least one X.509 certificate"));
     } else {
       InputStream certStream = new ByteArrayInputStream(anchor.getX509CertChain().get(0).decode());
       try {
