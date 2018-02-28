@@ -36,9 +36,9 @@ All commands by default will output to standard out. You can pass the `--output 
 
 ### Import
 
-Generates a country's trust anchor by supplying its certificate and the location of its metadata.
+Generates a country's trust anchor by supplying the location of its metadata and its certificate or multiple certificates if the country has a certificate chain.
 
-    ... import path/to/country.crt "https://metadata.example.com/example-country.xml"
+    ... import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
 
 ### Sign with file
 
