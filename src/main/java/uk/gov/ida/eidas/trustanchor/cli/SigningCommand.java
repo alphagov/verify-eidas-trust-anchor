@@ -9,6 +9,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,9 +25,13 @@ abstract class SigningCommand {
   private File outputFile;
 
   public Void build(PrivateKey key, X509Certificate certificate) throws Exception {
-    Stream<File> nonReadable = inputFiles.stream().filter(f -> !f.canRead());
-    if (nonReadable.count() != 0) {
-      String missingFiles = nonReadable.map(File::getPath).collect(Collectors.joining());
+    Collection<String> nonReadable = inputFiles.stream()
+        .filter(f -> !f.canRead())
+        .map(File::getPath)
+        .collect(Collectors.toList());
+      
+    if (!nonReadable.isEmpty()) {
+      String missingFiles = String.join(", ", nonReadable);
       throw new FileNotFoundException("Could not read files: " + missingFiles);
     }
 
