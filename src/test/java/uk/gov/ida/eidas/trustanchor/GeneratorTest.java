@@ -52,7 +52,7 @@ public class GeneratorTest {
     public void shouldHandleZeroInput() throws ParseException, JOSEException, CertificateEncodingException {
         List<String> files = new ArrayList<>();
 
-        JWSObject output = generator.generateJson(files);
+        JWSObject output = generator.generate(files);
 
         assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
@@ -61,9 +61,9 @@ public class GeneratorTest {
 
     @Test
     public void shouldHandleOneString() throws ParseException, JOSEException, CertificateEncodingException {
-        List<String> files = new ArrayList<>();
-        files.add(createJsonObject().toJSONString());
-        JWSObject output = generator.generateJson(files);
+        HashMap<String, String> trustAnchorMap = new HashMap<>();
+        trustAnchorMap.put("https://generator.test", TestCertificateStrings.UNCHAINED_PUBLIC_CERT);
+        JWSObject output = generator.generateFromMap(trustAnchorMap);
 
         assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
@@ -81,20 +81,20 @@ public class GeneratorTest {
         for (String attribute : valueList) {
             JSONObject invalid = createJsonObject();
             invalid.remove(attribute);
-            assertThrows(ParseException.class, () -> generator.generateJson(Collections.singletonList(invalid.toJSONString())));
+            assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(invalid.toJSONString())));
         }
     }
 
     @Test
     public void shouldThrowOnIncorrectValue() {
-        Map<String, Object> incorrectValues = new HashMap<String, Object>();
+        Map<String, Object> incorrectValues = new HashMap<>();
         incorrectValues.put("alg","A128KW");
         incorrectValues.put("kty", "oct");
 
         for (String attribute: incorrectValues.keySet()) {
             JSONObject jsonObject = createJsonObject();
             jsonObject.replace(attribute, incorrectValues.get(attribute));
-            assertThrows(ParseException.class, () -> generator.generateJson(Collections.singletonList(jsonObject.toJSONString())));
+            assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(jsonObject.toJSONString())));
         }
     }
 
@@ -105,7 +105,7 @@ public class GeneratorTest {
         for (Object attribute: incorrectValues) {
             JSONObject jsonObject = createJsonObject();
             jsonObject.replace("key_ops", attribute);
-            assertThrows(ParseException.class, () -> generator.generateJson(Collections.singletonList(jsonObject.toJSONString())));
+            assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(jsonObject.toJSONString())));
         }
     }
 
@@ -114,7 +114,7 @@ public class GeneratorTest {
         JSONObject jsonObject = createJsonObject();
         jsonObject.replace("x5c", Collections.singletonList(TestCertificateStrings.TEST_PUBLIC_CERT));
 
-        assertThrows(ParseException.class, () -> generator.generateJson(Collections.singletonList(jsonObject.toJSONString())));
+        assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(jsonObject.toJSONString())));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class GeneratorTest {
         invalidObject.remove("kid");
         files.add(invalidObject.toJSONString());
 
-        assertThrows(ParseException.class, () -> generator.generateJson(files));
+        assertThrows(ParseException.class, () -> generator.generate(files));
     }
 
     @Test
@@ -134,7 +134,7 @@ public class GeneratorTest {
         for (int i = 0; i < 1024; i++) {
             files.add(createJsonObject(String.format("https://%d.generator.test", i)).toJSONString());
         }
-        JWSObject output = generator.generateJson(files);
+        JWSObject output = generator.generate(files);
 
         assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));

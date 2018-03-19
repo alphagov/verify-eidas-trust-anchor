@@ -39,7 +39,7 @@ abstract class SigningCommand {
       inputs.add(new String(Files.readAllBytes(input.toPath())));
     }
     final Generator generator = new Generator(key, certificate);
-    final String generatedAnchors = generator.generate(inputs);
+    final String generatedAnchors = generator.generate(inputs).serialize();
 
     final OutputStreamWriter output = (outputFile == null ? new OutputStreamWriter(System.out) : new FileWriter(outputFile));
     output.write(generatedAnchors);
