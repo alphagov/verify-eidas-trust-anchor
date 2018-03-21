@@ -61,8 +61,8 @@ public class GeneratorTest {
 
     @Test
     public void shouldHandleOneString() throws ParseException, JOSEException, CertificateEncodingException {
-        HashMap<String, String> trustAnchorMap = new HashMap<>();
-        trustAnchorMap.put("https://generator.test", TestCertificateStrings.UNCHAINED_PUBLIC_CERT);
+        HashMap<String, X509Certificate> trustAnchorMap = new HashMap<>();
+        trustAnchorMap.put("https://generator.test", x509Certificate);
         JWSObject output = generator.generateFromMap(trustAnchorMap);
 
         assertSigned(output, publicKey);

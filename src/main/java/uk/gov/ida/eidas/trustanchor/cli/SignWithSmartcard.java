@@ -11,11 +11,8 @@ import uk.gov.ida.eidas.trustanchor.PKCS11KeyLoader;
 
 @Command(name="sign-with-smartcard", description="Signs the final key set with a key from a smartcard")
 public class SignWithSmartcard extends SigningCommand implements Callable<Void> {
-  @Option(names = { "-l", "--lib" }, description = "Location of the card access library (e.g. \"opensc.so\")", required=true)
-  private File library;
-
-  @Option(names = { "--symbol" }, description = "The name of the library symbol to call (e.g. \"opensc\")", required=true)
-  private String name;
+  @Option(names = { "--config" }, description = "PKCS#11 configuration passed as a file.\nSee https://tinyurl.com/pkcs11config", required=true)
+  private File pkcs11Config;
 
   @Option(names = { "--key" }, description = "Alias of the key on the smartcard", required=true)
   private String keyAlias;
@@ -28,8 +25,7 @@ public class SignWithSmartcard extends SigningCommand implements Callable<Void> 
 
   @Override
   public Void call() throws Exception {
-    final String config = String.format("--\nname=%s\nlibrary=%s", name, library.getAbsolutePath());
-    PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, config, password);
+    PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, pkcs11Config, password);
     PrivateKey key = keyLoader.getSigningKey(keyAlias);
     X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
     return build(key, certificate);

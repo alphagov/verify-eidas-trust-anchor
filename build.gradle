@@ -28,11 +28,11 @@ repositories {
 dependencies {
     compile 'com.nimbusds:nimbus-jose-jwt:5.4',
             'info.picocli:picocli:2.2.2',
-            'uk.gov.ida:security-utils:2.0.0-317',
             'org.json:json:20180130'
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-20',
                 'org.junit.jupiter:junit-jupiter-api:5.0.0',
+                'uk.gov.ida:security-utils:2.0.0-317',
                 'org.mockito:mockito-core:2.+'
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0',
