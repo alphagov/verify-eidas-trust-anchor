@@ -11,8 +11,8 @@ import uk.gov.ida.eidas.trustanchor.PKCS11KeyLoader;
 
 @Command(name="sign-with-smartcard", description="Signs the final key set with a key from a smartcard")
 public class SignWithSmartcard extends SigningCommand implements Callable<Void> {
-  @Option(names = { "--config" }, description = "PKCS#11 configuration. This can either be a file or a string starting with '--'.\nSee https://tinyurl.com/pkcs11config", required=true)
-  private String pkcs11Config;
+  @Option(names = { "--config" }, description = "PKCS#11 configuration passed as a file.\nSee https://tinyurl.com/pkcs11config", required=true)
+  private File pkcs11Config;
 
   @Option(names = { "--key" }, description = "Alias of the key on the smartcard", required=true)
   private String keyAlias;

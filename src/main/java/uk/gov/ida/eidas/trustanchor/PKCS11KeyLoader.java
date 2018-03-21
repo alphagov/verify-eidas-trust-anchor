@@ -1,7 +1,8 @@
 package uk.gov.ida.eidas.trustanchor;
 
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStore;
@@ -21,10 +22,10 @@ import java.security.cert.X509Certificate;
  */
 public class PKCS11KeyLoader {
   private final Class<? extends Provider> provider;
-  private final String pkcs11Config;
+  private final File pkcs11Config;
   private final String keyPassword;
 
-  public PKCS11KeyLoader(final Class<? extends Provider> provider, final String pkcs11Config, final String keyPassword) {
+  public PKCS11KeyLoader(final Class<? extends Provider> provider, final File pkcs11Config, final String keyPassword) {
     this.provider = provider;
     this.pkcs11Config = pkcs11Config;
     this.keyPassword = keyPassword;
@@ -61,11 +62,11 @@ public class PKCS11KeyLoader {
     return (X509Certificate) certificate;
   }
 
-  private static KeyStore getKeyStore(String pkcs11Config, Class<? extends Provider> klazz) throws NoSuchMethodException, SecurityException, InstantiationException,
+  private static KeyStore getKeyStore(File pkcs11Config, Class<? extends Provider> klazz) throws NoSuchMethodException, SecurityException, InstantiationException,
           IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, KeyStoreException {
     final Constructor<? extends Provider> constructor = klazz.getConstructor(String.class);
     final Provider provider = constructor.newInstance(pkcs11Config);
-    provider.load(new StringReader(pkcs11Config));
+    provider.load(new FileReader(pkcs11Config));
     Security.addProvider(provider);
     return KeyStore.getInstance("PKCS11", provider);
   }
