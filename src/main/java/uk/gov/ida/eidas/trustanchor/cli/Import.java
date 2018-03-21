@@ -1,17 +1,18 @@
 package uk.gov.ida.eidas.trustanchor.cli;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.OutputStreamWriter;
-import java.util.concurrent.Callable;
-
 import com.nimbusds.jose.jwk.JWK;
-
+import org.json.JSONObject;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
 import uk.gov.ida.eidas.trustanchor.CountryTrustAnchor;
+import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.concurrent.Callable;
 
 @Command(name="import", description="Import a certificate file and generate a JWK from it")
 class Import implements Callable<Void> {
@@ -25,12 +26,22 @@ class Import implements Callable<Void> {
     @Option(names={ "-o", "--output" }, description="File to output to. Defaults to stdout.", required=false)
     private File outputFile;
 
-	@Override
-	public Void call() throws Exception {
-    OutputStreamWriter output = (outputFile == null ? new OutputStreamWriter(System.out) : new FileWriter(outputFile));
-    JWK key = CountryTrustAnchor.make(FileKeyLoader.loadCerts(certificates), keyId);
-    output.write(key.toJSONString());
-    output.close();
-		return null;
-	}
+    @Override
+    public Void call() throws Exception {
+        JWK key = CountryTrustAnchor.make(FileKeyLoader.loadCerts(certificates), keyId);
+        writeOut(this.outputFile, keyToPrettyString(key));
+        return null;
+    }
+
+    private String keyToPrettyString(JWK key) {
+        final int INDENT_FACTOR = 4;
+        String uglyJsonString = key.toJSONObject().toJSONString();
+        return new JSONObject(uglyJsonString).toString(INDENT_FACTOR);
+    }
+
+    private void writeOut(File outputFile, String outputString) throws IOException {
+        OutputStreamWriter output = (outputFile == null ? new OutputStreamWriter(System.out) : new FileWriter(outputFile));
+        output.write(outputString);
+        output.close();
+    }
 }
