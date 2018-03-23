@@ -1,16 +1,17 @@
 Verify eIDAS Trust Anchor Generator
 ===================================
+[European identity schemes](https://ec.europa.eu/digital-single-market/en/e-identification) each have unique metadata containing their identity providers and public keys. Every metadata file is signed with a country-specific key which allows metadata consumers to trust its authenticity.
 
-[European identity schemes](https://ec.europa.eu/digital-single-market/en/e-identification) each have their own metadata which contains the scheme's identity providers and public keys. Each metadata file is signed with a key specific to each country which allows consumers of the metadata to trust its authenticity.
+We collect certificates for connected European countries into one place and sign them all together with a Verify key.
 
-To make it easier for [GOV.UK Verify](https://gov.uk/verify) relying parties to do this, we collect all of the certificates for connected European countries into one place and sign them all together with a Verify key. Relying parties can trust the collection of certificates because of the Verify certificate, and then trust individual metadata files by using the collection itself. This signed collection is called the _signed trust anchor_.
+Our relying parties can trust the collection of certificates because of the [GOV.UK Verify](https://gov.uk/verify) certificate, and then trust individual metadata files by using the collection. This signed collection is called the ‘signed trust anchor’.
 
 GOV.UK Verify expresses these anchors as [JSON Web Keys (JWK)](https://tools.ietf.org/html/rfc7517) and serves them signed in compact [JSON Web Signature (JWS)](https://tools.ietf.org/html/rfc7515) format.
 
 This tool can:
 * generate trust anchors from a country's certificate
 * aggregate many trust anchors together
-* sign the aggregated anchors into a full signed trust anchor.
+* sign the aggregated anchors into a full signed trust anchor
 
 ## Build
 
@@ -51,15 +52,15 @@ Aggregates and signs a collection of trust anchors by using a RSA private key su
 Aggregates and signs a collection of trust anchors by using a smartcard (such as a Yubikey) that can be accessed using PKCS11.
 
     ... sign-with-smartcard \
-      --lib path/to/smartcard-lib.so \
-      --symbol smartcard-lib-name \
+      --config pkcs11_config.txt \
       --key "Private Key alias" \
       --cert "Public Certificate alias" \
       --password 12345
 
-This requires an external native library, such as [OpenSC](https://github.com/opensc/opensc). The library path and symbol will [passed to the PKCS11 provider as configuration](https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html#P11Provider). For OpenSC, the correct choices might be:
+This requires an external native library, such as [OpenSC](https://github.com/opensc/opensc). The config gile will [passed to the PKCS11 provider as configuration](https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html#P11Provider). For OpenSC, the correct config file might be:
 
-    --lib /usr/local/lib/opensc-pkcs11.so --symbol opensc
+    library = /usr/local/lib/opensc-pkcs11.so
+    name = opensc
 
 ## Support and raising issues
 
