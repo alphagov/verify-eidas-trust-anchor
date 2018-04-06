@@ -56,7 +56,7 @@ public class GeneratorTest {
 
         assertSigned(output, publicKey);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
-        assertTrue(((List<Object>)output.getPayload().toJSONObject().get("keys")).isEmpty());
+        assertTrue(((List<Object>) output.getPayload().toJSONObject().get("keys")).isEmpty());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class GeneratorTest {
 
         List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
         assertEquals(1, keys.size());
-        assertEquals("https://generator.test",keys.get(0).getAsString("kid"));
+        assertEquals("https://generator.test", keys.get(0).getAsString("kid"));
         assertArrayEquals(x509Certificate.getEncoded(), output.getHeader().getX509CertChain().get(0).decode());
     }
 
@@ -88,10 +88,10 @@ public class GeneratorTest {
     @Test
     public void shouldThrowOnIncorrectValue() {
         Map<String, Object> incorrectValues = new HashMap<>();
-        incorrectValues.put("alg","A128KW");
+        incorrectValues.put("alg", "A128KW");
         incorrectValues.put("kty", "oct");
 
-        for (String attribute: incorrectValues.keySet()) {
+        for (String attribute : incorrectValues.keySet()) {
             JSONObject jsonObject = createJsonObject();
             jsonObject.replace(attribute, incorrectValues.get(attribute));
             assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(jsonObject.toJSONString())));
@@ -102,7 +102,7 @@ public class GeneratorTest {
     public void shouldThrowOnIncorrectKeyopsValues() {
         List<Object> incorrectValues = Arrays.asList(Arrays.asList(), Arrays.asList("sign"), Arrays.asList("verify", "sign"), "verify");
 
-        for (Object attribute: incorrectValues) {
+        for (Object attribute : incorrectValues) {
             JSONObject jsonObject = createJsonObject();
             jsonObject.replace("key_ops", attribute);
             assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(jsonObject.toJSONString())));
@@ -158,8 +158,8 @@ public class GeneratorTest {
         jsonObject.put("key_ops", Collections.singletonList("verify"));
         jsonObject.put("kid", kid);
         jsonObject.put("alg", "RS256");
-        jsonObject.put("e", new String (Base64.encodeInteger(publicKey.getPublicExponent())));
-        jsonObject.put("n", new String (Base64.encodeInteger(publicKey.getModulus())));
+        jsonObject.put("e", new String(Base64.encodeInteger(publicKey.getPublicExponent())));
+        jsonObject.put("n", new String(Base64.encodeInteger(publicKey.getModulus())));
         jsonObject.put("x5c", Collections.singletonList(TestCertificateStrings.UNCHAINED_PUBLIC_CERT));
 
         return jsonObject;

@@ -1,5 +1,10 @@
 package uk.gov.ida.eidas.trustanchor;
 
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSObject;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.JWKSet;
+
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -8,33 +13,29 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSObject;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
 
 public class Generator {
-  private final JWKSetSigner signer;
+    private final JWKSetSigner signer;
 
-  public Generator(PrivateKey signingKey, X509Certificate certificate) {
-    this.signer = new JWKSetSigner(signingKey, null, certificate);
-  }
-
-  public JWSObject generateFromMap(Map<String, X509Certificate> trustAnchorMap) throws ParseException, JOSEException, CertificateEncodingException {
-    List<JWK> keys = new ArrayList<>();
-    for (Map.Entry<String, X509Certificate> entry : trustAnchorMap.entrySet()) {
-      keys.add(CountryTrustAnchor.make(Arrays.asList(entry.getValue()), entry.getKey()));
+    public Generator(PrivateKey signingKey, X509Certificate certificate) {
+        this.signer = new JWKSetSigner(signingKey, null, certificate);
     }
 
-    return signer.sign(new JWKSet(keys));
-  }
+    public JWSObject generateFromMap(Map<String, X509Certificate> trustAnchorMap) throws ParseException, JOSEException, CertificateEncodingException {
+        List<JWK> keys = new ArrayList<>();
+        for (Map.Entry<String, X509Certificate> entry : trustAnchorMap.entrySet()) {
+            keys.add(CountryTrustAnchor.make(Arrays.asList(entry.getValue()), entry.getKey()));
+        }
 
-  public JWSObject generate(List<String> inputJSONs) throws JOSEException, ParseException, CertificateEncodingException {
-    List<JWK> keys = new ArrayList<>();
-    for (String input : inputJSONs) {
-      keys.add(CountryTrustAnchor.parse(input));
+        return signer.sign(new JWKSet(keys));
     }
 
-    return signer.sign(new JWKSet(keys));
-  }
+    public JWSObject generate(List<String> inputJSONs) throws JOSEException, ParseException, CertificateEncodingException {
+        List<JWK> keys = new ArrayList<>();
+        for (String input : inputJSONs) {
+            keys.add(CountryTrustAnchor.parse(input));
+        }
+
+        return signer.sign(new JWKSet(keys));
+    }
 }
