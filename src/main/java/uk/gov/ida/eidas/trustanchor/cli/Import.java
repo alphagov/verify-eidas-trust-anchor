@@ -14,16 +14,16 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.Callable;
 
-@Command(name="import", description="Import a certificate file and generate a JWK from it")
+@Command(name = "import", description = "Import a certificate file and generate a JWK from it")
 class Import implements Callable<Void> {
 
-    @Parameters(arity="1", index="0", description="The Key ID to assign, usually the metadata URL")
+    @Parameters(arity = "1", index = "0", description = "The Key ID to assign, usually the metadata URL")
     private String keyId;
 
-    @Parameters(arity="1..*", index="1", description="The certificate files to generate from")
+    @Parameters(arity = "1..*", index = "1", description = "The certificate files to generate from")
     private File[] certificates;
 
-    @Option(names={ "-o", "--output" }, description="File to output to. Defaults to stdout.", required=false)
+    @Option(names = {"-o", "--output"}, description = "File to output to. Defaults to stdout.", required = false)
     private File outputFile;
 
     @Override

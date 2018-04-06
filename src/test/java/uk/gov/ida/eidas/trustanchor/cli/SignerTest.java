@@ -20,7 +20,7 @@ public class SignerTest {
 
         PrivateKey key = mock(PrivateKey.class);
         X509Certificate certificate = mock(X509Certificate.class);
-        
+
         File inputFile = mock(File.class);
         when(inputFile.getPath()).thenReturn("test");
         when(inputFile.canRead()).thenReturn(false);
