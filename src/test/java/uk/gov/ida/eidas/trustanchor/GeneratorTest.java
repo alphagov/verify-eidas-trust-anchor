@@ -118,6 +118,14 @@ public class GeneratorTest {
     }
 
     @Test
+    public void shouldCheckAllX509Certificates(){
+        JSONObject jsonObject = createJsonObject();
+        jsonObject.replace("x5c", Arrays.asList(TestCertificateStrings.UNCHAINED_PUBLIC_CERT, TestCertificateStrings.TEST_PUBLIC_CERT));
+
+        assertThrows(ParseException.class, () -> generator.generate(Collections.singletonList(jsonObject.toJSONString())));
+    }
+
+    @Test
     public void shouldThrowOnOneInvalidKey() {
         List<String> files = new ArrayList<>();
         files.add(createJsonObject("https://1.generator.test").toJSONString());

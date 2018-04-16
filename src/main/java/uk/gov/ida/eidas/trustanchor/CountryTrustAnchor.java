@@ -2,11 +2,7 @@ package uk.gov.ida.eidas.trustanchor;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PublicKey;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
@@ -18,7 +14,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import com.nimbusds.jose.JOSEException;
@@ -91,16 +86,18 @@ public class CountryTrustAnchor {
     if (anchor.getX509CertChain() == null || anchor.getX509CertChain().size() == 0) {
       errors.add(String.format("Expecting at least one X.509 certificate"));
     } else {
-      InputStream certStream = new ByteArrayInputStream(anchor.getX509CertChain().get(0).decode());
-      try {
-        Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(certStream);
-        if(!certificate.getPublicKey().equals(((RSAKey)anchor).toPublicKey())) {
-          errors.add(String.format("X.509 Certificate does not match the public key"));
+      for (Base64 base64cert : anchor.getX509CertChain()) {
+        try {
+          InputStream certStream = new ByteArrayInputStream(base64cert.decode());
+          Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(certStream);
+          if (!certificate.getPublicKey().equals(((RSAKey) anchor).toPublicKey())) {
+            errors.add(String.format("X.509 Certificate does not match the public key"));
+          }
+        } catch (CertificateException e) {
+          errors.add(String.format("X.509 certificate factory not available", e.getMessage()));
+        } catch (JOSEException e) {
+          errors.add(String.format("Error getting public key from trust anchor", e.getMessage()));
         }
-      } catch (CertificateException e) {
-        errors.add(String.format("X.509 certificate factory not available", e.getMessage()));
-      } catch (JOSEException e) {
-        errors.add(String.format("Error getting public key from trust anchor", e.getMessage()));
       }
     }
     return errors;
