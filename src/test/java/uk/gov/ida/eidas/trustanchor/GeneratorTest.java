@@ -36,16 +36,16 @@ public class GeneratorTest {
 
     private Generator generator;
 
-    private RSAPublicKey publicKey;
+    private RSAPublicKey publicKeyForSigning;
 
-    private X509Certificate x509Certificate;
+    private X509Certificate certificateForSigning;
 
     @BeforeEach
     public void setUp() {
-        PrivateKey privateKey = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.UNCHAINED_PRIVATE_KEY));
-        x509Certificate = new X509CertificateFactory().createCertificate(TestCertificateStrings.UNCHAINED_PUBLIC_CERT);
-        generator = new Generator(privateKey, x509Certificate);
-        publicKey = (RSAPublicKey) x509Certificate.getPublicKey();
+        PrivateKey privateKeyForSigning = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY));
+        certificateForSigning = new X509CertificateFactory().createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);
+        generator = new Generator(privateKeyForSigning, certificateForSigning);
+        publicKeyForSigning = (RSAPublicKey) certificateForSigning.getPublicKey();
     }
 
     @Test
@@ -54,24 +54,26 @@ public class GeneratorTest {
 
         JWSObject output = generator.generate(files);
 
-        assertSigned(output, publicKey);
+        assertSigned(output, publicKeyForSigning);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
         assertTrue(((List<Object>)output.getPayload().toJSONObject().get("keys")).isEmpty());
     }
 
     @Test
-    public void shouldHandleOneString() throws ParseException, JOSEException, CertificateEncodingException {
+    public void shouldHandleOneString() throws JOSEException, CertificateEncodingException {
+        String countryPublicCert = TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
+        X509Certificate countryCertificate = new X509CertificateFactory().createCertificate(countryPublicCert);
         HashMap<String, X509Certificate> trustAnchorMap = new HashMap<>();
-        trustAnchorMap.put("https://generator.test", x509Certificate);
+        trustAnchorMap.put("https://generator.test", countryCertificate);
         JWSObject output = generator.generateFromMap(trustAnchorMap);
 
-        assertSigned(output, publicKey);
+        assertSigned(output, publicKeyForSigning);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
 
         List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
         assertEquals(1, keys.size());
         assertEquals("https://generator.test",keys.get(0).getAsString("kid"));
-        assertArrayEquals(x509Certificate.getEncoded(), output.getHeader().getX509CertChain().get(0).decode());
+        assertArrayEquals(certificateForSigning.getEncoded(), output.getHeader().getX509CertChain().get(0).decode());
     }
 
     @Test
@@ -126,6 +128,26 @@ public class GeneratorTest {
     }
 
     @Test
+    public void shouldThrowWhenDateOfX509CertificateIsInvalid(){
+        X509Certificate x509Certificate = new X509CertificateFactory().createCertificate(TestCertificateStrings.EXPIRED_SIGNING_PUBLIC_CERT);
+        RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
+
+        JSONObject jsonObject = createJsonObject();
+        jsonObject.replace("x5c", Collections.singletonList(TestCertificateStrings.EXPIRED_SIGNING_PUBLIC_CERT));
+        jsonObject.replace("e", new String (Base64.encodeInteger(rsaPublicKey.getPublicExponent())));
+        jsonObject.replace("n", new String (Base64.encodeInteger(rsaPublicKey.getModulus())));
+
+        String messages = "";
+        try {
+            generator.generate(Collections.singletonList(jsonObject.toJSONString()));
+        } catch (ParseException | JOSEException | CertificateEncodingException e){
+            messages = e.getMessage();
+        }
+
+        assertTrue(messages.contains("X.509 certificate has expired"));
+    }
+
+    @Test
     public void shouldThrowOnOneInvalidKey() {
         List<String> files = new ArrayList<>();
         files.add(createJsonObject("https://1.generator.test").toJSONString());
@@ -144,7 +166,7 @@ public class GeneratorTest {
         }
         JWSObject output = generator.generate(files);
 
-        assertSigned(output, publicKey);
+        assertSigned(output, publicKeyForSigning);
         assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
 
         List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
@@ -161,14 +183,17 @@ public class GeneratorTest {
     }
 
     private JSONObject createJsonObject(String kid) {
+        String countryPublicCert = TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
+        X509Certificate x509Certificate = new X509CertificateFactory().createCertificate(countryPublicCert);
+        RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("kty", "RSA");
         jsonObject.put("key_ops", Collections.singletonList("verify"));
         jsonObject.put("kid", kid);
         jsonObject.put("alg", "RS256");
-        jsonObject.put("e", new String (Base64.encodeInteger(publicKey.getPublicExponent())));
-        jsonObject.put("n", new String (Base64.encodeInteger(publicKey.getModulus())));
-        jsonObject.put("x5c", Collections.singletonList(TestCertificateStrings.UNCHAINED_PUBLIC_CERT));
+        jsonObject.put("e", new String (Base64.encodeInteger(rsaPublicKey.getPublicExponent())));
+        jsonObject.put("n", new String (Base64.encodeInteger(rsaPublicKey.getModulus())));
+        jsonObject.put("x5c", Collections.singletonList(countryPublicCert));
 
         return jsonObject;
     }

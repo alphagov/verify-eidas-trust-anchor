@@ -20,7 +20,7 @@ public class Generator {
     this.signer = new JWKSetSigner(signingKey, null, certificate);
   }
 
-  public JWSObject generateFromMap(Map<String, X509Certificate> trustAnchorMap) throws ParseException, JOSEException, CertificateEncodingException {
+  public JWSObject generateFromMap(Map<String, X509Certificate> trustAnchorMap) throws JOSEException, CertificateEncodingException {
     List<JWK> keys = new ArrayList<>();
     for (Map.Entry<String, X509Certificate> entry : trustAnchorMap.entrySet()) {
       keys.add(CountryTrustAnchor.make(Arrays.asList(entry.getValue()), entry.getKey()));

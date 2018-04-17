@@ -3,9 +3,9 @@ package uk.gov.ida.eidas.trustanchor;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAPublicKey;
@@ -25,7 +25,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.util.Base64;
 
 public class CountryTrustAnchor {
-  public static JWK make(List<X509Certificate> certificates, String keyId) throws CertificateEncodingException {
+  public static JWK make(List<X509Certificate> certificates, String keyId) {
     List<PublicKey> invalidPublicKeys = certificates.stream()
             .map(c -> c.getPublicKey())
             .filter(key -> !(key instanceof RSAPublicKey))
@@ -89,10 +89,13 @@ public class CountryTrustAnchor {
       for (Base64 base64cert : anchor.getX509CertChain()) {
         try {
           InputStream certStream = new ByteArrayInputStream(base64cert.decode());
-          Certificate certificate = CertificateFactory.getInstance("X.509").generateCertificate(certStream);
+          X509Certificate certificate = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(certStream);
           if (!certificate.getPublicKey().equals(((RSAKey) anchor).toPublicKey())) {
             errors.add(String.format("X.509 Certificate does not match the public key"));
           }
+          certificate.checkValidity();
+        } catch (CertificateExpiredException e) {
+          errors.add(String.format("X.509 certificate has expired", e.getMessage()));
         } catch (CertificateException e) {
           errors.add(String.format("X.509 certificate factory not available", e.getMessage()));
         } catch (JOSEException e) {
