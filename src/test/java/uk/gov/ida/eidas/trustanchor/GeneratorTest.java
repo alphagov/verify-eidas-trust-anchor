@@ -137,14 +137,14 @@ public class GeneratorTest {
         jsonObject.replace("e", new String (Base64.encodeInteger(rsaPublicKey.getPublicExponent())));
         jsonObject.replace("n", new String (Base64.encodeInteger(rsaPublicKey.getModulus())));
 
-        String messages = "";
+        String message = "";
         try {
             generator.generate(Collections.singletonList(jsonObject.toJSONString()));
         } catch (ParseException | JOSEException | CertificateEncodingException e){
-            messages = e.getMessage();
+            message = e.getMessage();
         }
 
-        assertTrue(messages.contains("X.509 certificate has expired"));
+        assertTrue(message.contains("X.509 certificate has expired"));
     }
 
     @Test
@@ -204,5 +204,4 @@ public class GeneratorTest {
         assertNotEquals("", output.getSignature().decodeToString());
         assertTrue(output.verify(new RSASSAVerifier(signedKey)));
     }
-
 }
