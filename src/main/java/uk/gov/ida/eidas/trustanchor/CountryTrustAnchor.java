@@ -24,12 +24,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CountryTrustAnchor {
 
   public static JWK make(List<X509Certificate> certificates, String keyId) {
-    List<PublicKey> invalidPublicKeys = certificates.stream()
-            .map(c -> c.getPublicKey())
+      Stream<X509Certificate> stream = certificates.stream();
+      List<PublicKey> invalidPublicKeys = stream
+            .map(X509Certificate::getPublicKey)
             .filter(key -> !(key instanceof RSAPublicKey))
             .collect(Collectors.toList());
 
@@ -41,7 +43,9 @@ public class CountryTrustAnchor {
     }
 
     RSAPublicKey publicKey = (RSAPublicKey) certificates.get(0).getPublicKey();
-    List<Base64> encodedCertChain = certificates.stream().map(certificate -> {
+
+      List<Base64> encodedSortedCertChain = CertificateSorter.sort(certificates).stream()
+              .map(certificate -> {
       try {
         return Base64.encode(certificate.getEncoded());
       } catch (CertificateEncodingException e) {
@@ -49,11 +53,11 @@ public class CountryTrustAnchor {
       }
     }).collect(Collectors.toList());
 
-    RSAKey key = new RSAKey.Builder(publicKey)
+    JWK key = new RSAKey.Builder(publicKey)
       .algorithm(JWSAlgorithm.RS256)
       .keyOperations(Collections.singleton(KeyOperation.VERIFY))
       .keyID(keyId)
-      .x509CertChain(encodedCertChain)
+      .x509CertChain(encodedSortedCertChain)
       .build();
 
     Collection<String> errors = findErrors(key);
@@ -64,7 +68,7 @@ public class CountryTrustAnchor {
     return key;
   }
 
-  public static JWK parse(String json) throws ParseException {
+    public static JWK parse(String json) throws ParseException {
     JWK key = JWK.parse(json);
 
     Collection<String> errors = findErrors(key);

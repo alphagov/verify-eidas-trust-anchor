@@ -4,9 +4,9 @@ buildscript {
     }
     dependencies {
         classpath 'org.gradle.plugins:gradle-compass:1.0.7',
-                  'uk.gov.ida:ida-gradle:1.1.0-15',
-                  'com.github.ben-manes:gradle-versions-plugin:0.11.3',
-                  'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+                'uk.gov.ida:ida-gradle:1.1.0-15',
+                'com.github.ben-manes:gradle-versions-plugin:0.11.3',
+                'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
     }
 }
 
@@ -31,12 +31,13 @@ dependencies {
             'org.json:json:20180130'
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-23',
-                'org.junit.jupiter:junit-jupiter-api:5.0.0',
-                'uk.gov.ida:security-utils:2.0.0-317',
-                'org.mockito:mockito-core:2.+'
+            'org.junit.jupiter:junit-jupiter-api:5.0.0',
+            'uk.gov.ida:security-utils:2.0.0-317',
+            'org.mockito:mockito-core:2.+',
+            'org.assertj:assertj-core:3.9.1'
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0',
-                'org.junit.platform:junit-platform-launcher:1.0.1'
+            'org.junit.platform:junit-platform-launcher:1.0.1'
 }
 
 task copyToLib(dependsOn: jar, type: Copy) {
