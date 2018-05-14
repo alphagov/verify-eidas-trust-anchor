@@ -1,5 +1,7 @@
 package uk.gov.ida.eidas.trustanchor;
 
+import certificates.values.CACertificates;
+import com.google.common.collect.ImmutableList;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -25,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -61,10 +64,10 @@ public class GeneratorTest {
 
     @Test
     public void shouldHandleOneString() throws JOSEException, CertificateEncodingException {
-        String countryPublicCert = TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
+        String countryPublicCert = CACertificates.TEST_ROOT_CA;
         X509Certificate countryCertificate = new X509CertificateFactory().createCertificate(countryPublicCert);
-        HashMap<String, X509Certificate> trustAnchorMap = new HashMap<>();
-        trustAnchorMap.put("https://generator.test", countryCertificate);
+        HashMap<String, List<X509Certificate>> trustAnchorMap = new HashMap<>();
+        trustAnchorMap.put("https://generator.test", ImmutableList.of(countryCertificate));
         JWSObject output = generator.generateFromMap(trustAnchorMap);
 
         assertSigned(output, publicKeyForSigning);
@@ -129,22 +132,20 @@ public class GeneratorTest {
 
     @Test
     public void shouldThrowWhenDateOfX509CertificateIsInvalid(){
-        X509Certificate x509Certificate = new X509CertificateFactory().createCertificate(TestCertificateStrings.EXPIRED_SIGNING_PUBLIC_CERT);
+
+        String expiredCert = TestCertificateStrings.EXPIRED_SELF_SIGNED_SIGNING_PUBLIC_CERT;
+
+        X509Certificate x509Certificate = new X509CertificateFactory().createCertificate(expiredCert);
         RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
 
         JSONObject jsonObject = createJsonObject();
-        jsonObject.replace("x5c", Collections.singletonList(TestCertificateStrings.EXPIRED_SIGNING_PUBLIC_CERT));
+        jsonObject.replace("x5c", Collections.singletonList(expiredCert));
         jsonObject.replace("e", new String (Base64.encodeInteger(rsaPublicKey.getPublicExponent())));
         jsonObject.replace("n", new String (Base64.encodeInteger(rsaPublicKey.getModulus())));
 
-        String message = "";
-        try {
-            generator.generate(Collections.singletonList(jsonObject.toJSONString()));
-        } catch (ParseException | JOSEException | CertificateEncodingException e){
-            message = e.getMessage();
-        }
-
-        assertTrue(message.contains("X.509 certificate has expired"));
+        assertThatExceptionOfType(ParseException.class)
+                .isThrownBy(() -> generator.generate(Collections.singletonList(jsonObject.toJSONString())))
+                .withMessageContaining("X.509 certificate has expired");
     }
 
     @Test
@@ -183,7 +184,9 @@ public class GeneratorTest {
     }
 
     private JSONObject createJsonObject(String kid) {
-        String countryPublicCert = TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT;
+        String countryPublicCert = CACertificates.TEST_ROOT_CA;
+        countryPublicCert = countryPublicCert.replace("-----BEGIN CERTIFICATE-----\n", "").replace("\n-----END CERTIFICATE-----", ""
+        ).trim();
         X509Certificate x509Certificate = new X509CertificateFactory().createCertificate(countryPublicCert);
         RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
         JSONObject jsonObject = new JSONObject();

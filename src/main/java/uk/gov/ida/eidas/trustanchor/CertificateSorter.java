@@ -1,6 +1,7 @@
 package uk.gov.ida.eidas.trustanchor;
 
 import javax.security.auth.x500.X500Principal;
+import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,22 +13,24 @@ import java.util.stream.Collectors;
 public class CertificateSorter {
     public static List<X509Certificate> sort(List<X509Certificate> certificates) {
 
-        if (certificates.size() <= 1) {
+        List<X500Principal> issuers = issuerX500s(certificates);
+
+        if (certificates.size() == 1) {
+            X509Certificate x509Certificate = certificates.get(0);
+            validateSelfSigned(x509Certificate);
             return certificates;
         }
 
-        List<X500Principal> issuers = issuerX500s(certificates);
-
         return certificates.stream()
-                .filter(c -> !issuers.contains(c.getSubjectX500Principal()))
-                .reduce(limitToOneChild())
+                .filter(c -> issuers.isEmpty() || !issuers.contains(c.getSubjectX500Principal()))
+                .reduce(throwIfMoreThanOneElement("Found multiple certificates without issuers"))
                 .map(getSortedChain(certificates))
-                .orElse(new LinkedList<>());
+                .orElse(certificates);
     }
 
-    private static BinaryOperator<X509Certificate> limitToOneChild() {
+    private static BinaryOperator<X509Certificate> throwIfMoreThanOneElement(String message) {
         return (element, otherElement) -> {
-            throw new IllegalArgumentException("Found multiple certificates without issuers");
+            throw new IllegalArgumentException(message + " Found: [" + element.getSubjectX500Principal() + "], [" + otherElement.getSubjectX500Principal() + "]");
         };
     }
 
@@ -55,8 +58,17 @@ public class CertificateSorter {
     private static List<X509Certificate> findParent(X509Certificate firstCert, List<X509Certificate> x509Certificates) {
         return x509Certificates.stream()
                 .filter(cert -> Objects.equals(cert.getSubjectX500Principal(), firstCert.getIssuerX500Principal()))
-                .findFirst()
+                .reduce(throwIfMoreThanOneElement("Found multiple parents for certificate [" + firstCert.getSubjectX500Principal() + "]"))
                 .map(getSortedChain(x509Certificates))
-                .orElse(new LinkedList<>());
+                .orElseGet(() -> validateSelfSigned(firstCert));
+    }
+
+    private static List<X509Certificate> validateSelfSigned(X509Certificate firstCert) {
+        try {
+            firstCert.verify(firstCert.getPublicKey());
+            return new LinkedList<>();
+        } catch (GeneralSecurityException e) {
+            throw new IllegalArgumentException("Root cert is not self signed", e);
+        }
     }
 }
