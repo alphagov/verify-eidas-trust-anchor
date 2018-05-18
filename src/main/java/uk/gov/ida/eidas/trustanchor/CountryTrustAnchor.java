@@ -1,6 +1,7 @@
 package uk.gov.ida.eidas.trustanchor;
 
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.KeyOperation;
 import com.nimbusds.jose.jwk.KeyType;
@@ -10,9 +11,9 @@ import com.nimbusds.jose.util.Base64;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -20,45 +21,34 @@ import java.util.stream.Collectors;
 
 public class CountryTrustAnchor {
 
-  public static JWK make(List<X509Certificate> certificates, String keyId) {
+    public static JWK make(List<X509Certificate> certificates, String keyId) {
 
-      List<PublicKey> invalidPublicKeys = certificates.stream()
-              .map(X509Certificate::getPublicKey)
-              .filter(key -> !(key instanceof RSAPublicKey))
-              .collect(Collectors.toList());
+        if (certificates.isEmpty()) {
+            throw new IllegalArgumentException("Certificate list empty");
+        }
 
-    if (!invalidPublicKeys.isEmpty()) {
-      throw new RuntimeException(String.format(
-        "Certificate public key(s) in wrong format, got %s, expecting %s",
-        String.join(" ", invalidPublicKeys.stream().map(key -> key.getClass().getName()).collect(Collectors.toList())),
-        RSAPublicKey.class.getName()));
+        List<Base64> encodedSortedCertChain = CertificateSorter.sort(certificates).stream()
+                .map(certificate -> {
+                    try {
+                        return Base64.encode(certificate.getEncoded());
+                    } catch (CertificateEncodingException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).collect(Collectors.toList());
+
+        final KeyType certificateKeyType = getSupportedKeyType(certificates);
+
+        JWK key = certificateKeyType == KeyType.RSA ?
+                buildJWKFromRSAKey((RSAPublicKey) certificates.get(0).getPublicKey(), keyId, encodedSortedCertChain) :
+                buildJWKFromECKey((ECPublicKey) certificates.get(0).getPublicKey(), keyId, encodedSortedCertChain);
+
+        Collection<String> errors = CountryTrustAnchorValidator.build().findErrors(key);
+        if (!errors.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Managed to generate an invalid anchor: %s", String.join(", ", errors)));
+        }
+
+        return key;
     }
-
-    RSAPublicKey publicKey = (RSAPublicKey) certificates.get(0).getPublicKey();
-
-      List<Base64> encodedSortedCertChain = CertificateSorter.sort(certificates).stream()
-              .map(certificate -> {
-      try {
-        return Base64.encode(certificate.getEncoded());
-      } catch (CertificateEncodingException e) {
-        throw new RuntimeException(e);
-      }
-    }).collect(Collectors.toList());
-
-      RSAKey key = new RSAKey.Builder(publicKey)
-      .algorithm(JWSAlgorithm.RS256)
-      .keyOperations(Collections.singleton(KeyOperation.VERIFY))
-      .keyID(keyId)
-      .x509CertChain(encodedSortedCertChain)
-      .build();
-
-    Collection<String> errors = CountryTrustAnchorValidator.build().findErrors(key);
-    if (!errors.isEmpty()) {
-      throw new Error(String.format("Managed to generate an invalid anchor: %s", String.join(", ", errors)));
-    }
-
-    return key;
-  }
 
     public static JWK parse(String json) throws ParseException {
         JWK key = JWK.parse(json);
@@ -81,13 +71,53 @@ public class CountryTrustAnchor {
     }
 
     private static Collection<String> findTrustAnchorErrors(JWK trustAnchor) {
-        Collection<String> errors;
-        if (trustAnchor instanceof RSAKey) {
-            errors = CountryTrustAnchorValidator.build().findErrors((RSAKey) trustAnchor);
-        } else {
-            errors = new ArrayList<>();
-            errors.add(String.format("Expecting key type to be %s, was %s", KeyType.RSA, trustAnchor.getKeyType()));
+        if (trustAnchor instanceof RSAKey || trustAnchor instanceof ECKey) {
+            return CountryTrustAnchorValidator.build().findErrors(trustAnchor);
         }
-        return errors;
+
+        return Collections.singletonList(String.format(
+                "Unsupported key type %s. Expecting key type to be %s or %s",
+                KeyType.RSA, KeyType.EC, trustAnchor.getKeyType()));
+    }
+
+    private static KeyType getSupportedKeyType(List<X509Certificate> certificates) {
+        final List<PublicKey> publicKeys = certificates.stream().map(X509Certificate::getPublicKey).collect(Collectors.toList());
+
+        if (publicKeys.stream().map(PublicKey::getClass).distinct().count() > 1) {
+            throw new IllegalArgumentException(String.format(
+                    "Certificate public key(s) in wrong format, got %s, expecting all %s or all %s",
+                    publicKeys.stream().map(key -> key.getClass().getName()).collect(Collectors.joining(" ")),
+                    RSAPublicKey.class.getName(), ECPublicKey.class.getName()));
+        }
+
+        if (publicKeys.stream().allMatch(key -> key instanceof RSAPublicKey)) {
+            return KeyType.RSA;
+        }
+
+        if (publicKeys.stream().allMatch(key -> key instanceof ECPublicKey)) {
+            return KeyType.EC;
+        }
+
+        throw new IllegalArgumentException(String.format(
+                "Unsupported key type %s. Expecting key type to be %s or %s",
+                publicKeys.get(0).getClass().getName(), KeyType.RSA, KeyType.EC));
+    }
+
+    private static JWK buildJWKFromRSAKey(RSAPublicKey key, String keyId, List<Base64> encodedSortedCertChain) {
+        return new RSAKey.Builder(key)
+                .algorithm(JWSAlgorithm.RS256)
+                .keyOperations(Collections.singleton(KeyOperation.VERIFY))
+                .keyID(keyId)
+                .x509CertChain(encodedSortedCertChain)
+                .build();
+    }
+
+    private static JWK buildJWKFromECKey(ECPublicKey key, String keyId, List<Base64> encodedSortedCertChain) {
+        return new ECKey.Builder(ECKeyHelper.getCurve(key), key)
+                .algorithm(ECKeyHelper.getJWSAlgorithm(key))
+                .keyOperations(Collections.singleton(KeyOperation.VERIFY))
+                .keyID(keyId)
+                .x509CertChain(encodedSortedCertChain)
+                .build();
     }
 }
