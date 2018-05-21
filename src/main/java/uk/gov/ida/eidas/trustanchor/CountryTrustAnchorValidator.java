@@ -23,7 +23,7 @@ public class CountryTrustAnchorValidator {
     /**
      * @throws IllegalStateException if cannot build x509 CertificateFactory
      */
-    static CountryTrustAnchorValidator build() {
+    public static CountryTrustAnchorValidator build() {
         Base64X509CertificateDecoder decoder;
         try {
             decoder = new Base64X509CertificateDecoder();
