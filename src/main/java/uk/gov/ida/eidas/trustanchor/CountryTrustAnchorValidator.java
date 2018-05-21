@@ -16,7 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 
-class CountryTrustAnchorValidator {
+public class CountryTrustAnchorValidator {
 
     private final CertificateValidator certificateValidator;
 
