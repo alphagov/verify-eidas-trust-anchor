@@ -27,7 +27,8 @@ public class CountryTrustAnchor {
             throw new IllegalArgumentException("Certificate list empty");
         }
 
-        List<Base64> encodedSortedCertChain = CertificateSorter.sort(certificates).stream()
+        final List<X509Certificate> sortedCertificates = CertificateSorter.sort(certificates);
+        List<Base64> encodedSortedCertChain = sortedCertificates.stream()
                 .map(certificate -> {
                     try {
                         return Base64.encode(certificate.getEncoded());
@@ -37,7 +38,7 @@ public class CountryTrustAnchor {
                 }).collect(Collectors.toList());
 
 
-        JWK key = buildJWK(getSupportedKeyType(certificates), keyId, certificates.get(0), encodedSortedCertChain);
+        JWK key = buildJWK(getSupportedKeyType(certificates), keyId, sortedCertificates.get(0), encodedSortedCertChain);
 
         Collection<String> errors = CountryTrustAnchorValidator.build().findErrors(key);
         if (!errors.isEmpty()) {

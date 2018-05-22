@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -77,6 +78,27 @@ public class GeneratorTest {
         assertEquals(1, keys.size());
         assertEquals("https://generator.test",keys.get(0).getAsString("kid"));
         assertArrayEquals(certificateForSigning.getEncoded(), output.getHeader().getX509CertChain().get(0).decode());
+    }
+
+    @Test
+    public void shouldHandleChainOfCertificates() throws CertificateEncodingException, JOSEException {
+        List<String> certificates = asList(
+            CACertificates.TEST_ROOT_CA,
+            CACertificates.TEST_IDP_CA,
+            TestCertificateStrings.STUB_COUNTRY_PUBLIC_PRIMARY_CERT
+        );
+        X509CertificateFactory factory = new X509CertificateFactory();
+        List<X509Certificate> certs = certificates.stream().map(factory::createCertificate).collect(Collectors.toList());
+        HashMap<String, List<X509Certificate>> trustAnchorMap = new HashMap<>();
+        trustAnchorMap.put("https://generator.test", certs);
+        JWSObject output = generator.generateFromMap(trustAnchorMap);
+
+        assertSigned(output, publicKeyForSigning);
+        assertTrue(output.getPayload().toJSONObject().containsKey("keys"));
+
+        List<JSONObject> keys = (List<JSONObject>) output.getPayload().toJSONObject().get("keys");
+        assertEquals(1, keys.size());
+        assertEquals("https://generator.test",keys.get(0).getAsString("kid"));
     }
 
     @Test
