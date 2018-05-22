@@ -17,7 +17,7 @@ public class CertificateSorter {
 
         if (certificates.size() == 1) {
             X509Certificate x509Certificate = certificates.get(0);
-            validateSelfSigned(x509Certificate);
+            validateRootSelfSigned(x509Certificate);
             return certificates;
         }
 
@@ -40,7 +40,6 @@ public class CertificateSorter {
                 .collect(Collectors.toList());
     }
 
-
     private static Function<X509Certificate, List<X509Certificate>> getSortedChain(List<X509Certificate> x509Certificates) {
         return child -> {
             List<X509Certificate> sortedList = new LinkedList<>();
@@ -60,12 +59,12 @@ public class CertificateSorter {
                 .filter(cert -> Objects.equals(cert.getSubjectX500Principal(), firstCert.getIssuerX500Principal()))
                 .reduce(throwIfMoreThanOneElement("Found multiple parents for certificate [" + firstCert.getSubjectX500Principal() + "]"))
                 .map(getSortedChain(x509Certificates))
-                .orElseGet(() -> validateSelfSigned(firstCert));
+                .orElseGet(() -> validateRootSelfSigned(firstCert));
     }
 
-    private static List<X509Certificate> validateSelfSigned(X509Certificate firstCert) {
+    private static List<X509Certificate> validateRootSelfSigned(X509Certificate rootCert) {
         try {
-            firstCert.verify(firstCert.getPublicKey());
+            rootCert.verify(rootCert.getPublicKey());
             return new LinkedList<>();
         } catch (GeneralSecurityException e) {
             throw new IllegalArgumentException("Root cert is not self signed", e);

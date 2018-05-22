@@ -36,11 +36,8 @@ public class CountryTrustAnchor {
                     }
                 }).collect(Collectors.toList());
 
-        final KeyType certificateKeyType = getSupportedKeyType(certificates);
 
-        JWK key = certificateKeyType == KeyType.RSA ?
-                buildJWKFromRSAKey((RSAPublicKey) certificates.get(0).getPublicKey(), keyId, encodedSortedCertChain) :
-                buildJWKFromECKey((ECPublicKey) certificates.get(0).getPublicKey(), keyId, encodedSortedCertChain);
+        JWK key = buildJWK(getSupportedKeyType(certificates), keyId, certificates.get(0), encodedSortedCertChain);
 
         Collection<String> errors = CountryTrustAnchorValidator.build().findErrors(key);
         if (!errors.isEmpty()) {
@@ -103,8 +100,22 @@ public class CountryTrustAnchor {
                 publicKeys.get(0).getClass().getName(), KeyType.RSA, KeyType.EC));
     }
 
-    private static JWK buildJWKFromRSAKey(RSAPublicKey key, String keyId, List<Base64> encodedSortedCertChain) {
-        return new RSAKey.Builder(key)
+    private static JWK buildJWK(KeyType keyType, String keyId, X509Certificate certificate, List<Base64> encodedSortedCertChain) {
+        if (keyType == KeyType.RSA) {
+            return buildJWKFromRSAKey(keyId, certificate, encodedSortedCertChain);
+        }
+
+        if (keyType == KeyType.EC) {
+            return buildJWKFromECKey(keyId, certificate, encodedSortedCertChain);
+        }
+
+        throw new IllegalArgumentException(String.format(
+                "Could not build JWK from unsupported key type %s. Expecting key type to be %s or %s",
+                keyType, KeyType.RSA, KeyType.EC));
+    }
+
+    private static JWK buildJWKFromRSAKey(String keyId, X509Certificate certificate, List<Base64> encodedSortedCertChain) {
+        return new RSAKey.Builder((RSAPublicKey) certificate.getPublicKey())
                 .algorithm(JWSAlgorithm.RS256)
                 .keyOperations(Collections.singleton(KeyOperation.VERIFY))
                 .keyID(keyId)
@@ -112,7 +123,8 @@ public class CountryTrustAnchor {
                 .build();
     }
 
-    private static JWK buildJWKFromECKey(ECPublicKey key, String keyId, List<Base64> encodedSortedCertChain) {
+    private static JWK buildJWKFromECKey(String keyId, X509Certificate certificate, List<Base64> encodedSortedCertChain) {
+        ECPublicKey key = (ECPublicKey) certificate.getPublicKey();
         return new ECKey.Builder(ECKeyHelper.getCurve(key), key)
                 .algorithm(ECKeyHelper.getJWSAlgorithm(key))
                 .keyOperations(Collections.singleton(KeyOperation.VERIFY))
