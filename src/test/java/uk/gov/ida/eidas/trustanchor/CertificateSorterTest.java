@@ -4,14 +4,11 @@ import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import javax.security.auth.x500.X500Principal;
-import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -194,5 +191,4 @@ public class CertificateSorterTest {
     private String principalName(String id) {
         return "CN=" + id + ", OU=GDS, O=CO, C=UK";
     }
-
 }
