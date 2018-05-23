@@ -29,7 +29,7 @@ dependencies {
     compile 'com.nimbusds:nimbus-jose-jwt:5.4',
             'info.picocli:picocli:2.2.2',
             'org.json:json:20180130',
-            'com.google.guava:guava:16+'
+            'com.google.guava:guava:23.1-jre'
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-28',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',
