@@ -2,7 +2,6 @@ package uk.gov.ida.eidas.trustanchor;
 
 import com.nimbusds.jose.util.Base64;
 
-import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
@@ -14,7 +13,6 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 class CertificateValidator {
@@ -68,8 +66,6 @@ class CertificateValidator {
             signedCert = signingCert;
         }
 
-        chainErrors.addAll(verifyRootSelfSigned(signedCert));
-
         return chainErrors;
     }
 
@@ -119,15 +115,5 @@ class CertificateValidator {
             );
         }
         return signatureErrors;
-    }
-
-    private List<String> verifyRootSelfSigned(X509Certificate rootCert) {
-        try {
-            rootCert.verify(rootCert.getPublicKey());
-            return Collections.emptyList();
-        } catch (GeneralSecurityException e) {
-            return Collections.singletonList(String.format("Root cert is not self signed. [%s] %s",
-                    rootCert.getSubjectX500Principal(), e.getMessage()));
-        }
     }
 }

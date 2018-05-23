@@ -32,21 +32,6 @@ public class CertificateSorterTest {
     }
 
     @Test
-    public void shouldThrowExceptionIfSingleCertIsNotSelfSigned() throws GeneralSecurityException {
-        X509Certificate testCertificate = mock(X509Certificate.class);
-        X500Principal x500Parent = new X500Principal(principalName("parent"));
-        X500Principal x500Leaf = new X500Principal(principalName("leaf"));
-
-        when(testCertificate.getIssuerX500Principal()).thenReturn(x500Parent);
-        when(testCertificate.getSubjectX500Principal()).thenReturn(x500Leaf);
-        doThrow(new IllegalArgumentException()).when(testCertificate).verify(any());
-        ImmutableList<X509Certificate> testCertificates = ImmutableList.of(testCertificate);
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> CertificateSorter.sort(testCertificates));
-    }
-
-    @Test
     public void shouldReturnSameTwoCertListWhenGivenTwoCertsInOrder() {
         X509Certificate leafCert = mock(X509Certificate.class);
         X509Certificate parentCert = mock(X509Certificate.class);
@@ -61,24 +46,6 @@ public class CertificateSorterTest {
         List<X509Certificate> sortedCerts = CertificateSorter.sort(testCertificates);
 
         assertThat(sortedCerts).isEqualTo(testCertificates);
-    }
-
-    @Test
-    public void shouldThrowExceptionWhenRootIsNotSelfSigned() throws GeneralSecurityException {
-        X509Certificate leafCert = mock(X509Certificate.class);
-        X509Certificate parentCert = mock(X509Certificate.class);
-        X500Principal x500Parent = new X500Principal(principalName("parent"));
-        X500Principal x500Leaf = new X500Principal(principalName("leaf"));
-
-        when(leafCert.getIssuerX500Principal()).thenReturn(x500Parent);
-        when(leafCert.getSubjectX500Principal()).thenReturn(x500Leaf);
-        when(parentCert.getSubjectX500Principal()).thenReturn(x500Parent);
-        doThrow(new IllegalArgumentException()).when(parentCert).verify(any());
-
-        ImmutableList<X509Certificate> testCertificates = ImmutableList.of(leafCert, parentCert);
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> CertificateSorter.sort(testCertificates));
     }
 
     @Test
