@@ -1,6 +1,11 @@
 buildscript {
     repositories {
-        maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
+        if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
+            jcenter()
+        }
+        else {
+            maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
+        }
     }
     dependencies {
         classpath 'org.gradle.plugins:gradle-compass:1.0.7',
