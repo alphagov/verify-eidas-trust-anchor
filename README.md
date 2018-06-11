@@ -1,5 +1,8 @@
 Verify eIDAS Trust Anchor Generator
 ===================================
+
+[![Build Status](https://travis-ci.org/alphagov/verify-eidas-trust-anchor.svg?branch=master)](https://travis-ci.org/alphagov/verify-eidas-trust-anchor)
+
 [European identity schemes](https://ec.europa.eu/digital-single-market/en/e-identification) each have unique metadata containing their identity providers and public keys. Every metadata file is signed with a country-specific key which allows metadata consumers to trust its authenticity.
 
 We collect certificates for connected European countries into one place and sign them all together with a Verify key.
