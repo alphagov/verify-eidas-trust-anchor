@@ -2,6 +2,8 @@ buildscript {
     repositories {
         if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
             jcenter()
+            maven { url "https://dl.bintray.com/alphagov/maven-test" }
+            maven { url "https://dl.bintray.com/robfletcher/gradle-plugins" }
         }
         else {
             maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
@@ -9,7 +11,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.gradle.plugins:gradle-compass:1.0.7',
-                'uk.gov.ida:ida-gradle:1.1.0-15',
+                'uk.gov.ida:ida-gradle:1.1.0-23',
                 'com.github.ben-manes:gradle-versions-plugin:0.11.3',
                 'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
     }
