@@ -3,6 +3,7 @@ package uk.gov.ida.eidas.trustanchor.cli;
 import java.io.*;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 
 import picocli.CommandLine.Option;
@@ -10,7 +11,7 @@ import picocli.CommandLine.Parameters;
 
 abstract class SigningCommand {
   @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")
-  private List<File> inputFiles;
+  private List<File> inputFiles = new ArrayList<>();
 
   @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = false)
   private File outputFile;
