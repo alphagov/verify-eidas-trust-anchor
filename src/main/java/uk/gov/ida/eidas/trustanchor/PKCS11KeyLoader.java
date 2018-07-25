@@ -65,7 +65,7 @@ public class PKCS11KeyLoader {
   private static KeyStore getKeyStore(File pkcs11Config, Class<? extends Provider> klazz) throws NoSuchMethodException, SecurityException, InstantiationException,
           IllegalAccessException, IllegalArgumentException, InvocationTargetException, IOException, KeyStoreException {
     final Constructor<? extends Provider> constructor = klazz.getConstructor(String.class);
-    final Provider provider = constructor.newInstance(pkcs11Config);
+    final Provider provider = constructor.newInstance(pkcs11Config.getAbsolutePath());
     provider.load(new FileReader(pkcs11Config));
     Security.addProvider(provider);
     return KeyStore.getInstance("PKCS11", provider);
