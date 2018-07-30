@@ -15,6 +15,7 @@ This tool can:
 * generate trust anchors from a country's certificate
 * aggregate many trust anchors together
 * sign the aggregated anchors into a full signed trust anchor
+* print a full signed trust anchor to show its constituent keys
 
 ## Build
 
@@ -60,10 +61,16 @@ Aggregates and signs a collection of trust anchors by using a smartcard (such as
       --cert "Public Certificate alias" \
       --password 12345
 
-This requires an external native library, such as [OpenSC](https://github.com/opensc/opensc). The config gile will [passed to the PKCS11 provider as configuration](https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html#P11Provider). For OpenSC, the correct config file might be:
+This requires an external native library, such as [OpenSC](https://github.com/opensc/opensc). The config file will [passed to the PKCS11 provider as configuration](https://docs.oracle.com/javase/8/docs/technotes/guides/security/p11guide.html#P11Provider). For OpenSC, the correct config file might be:
 
     library = /usr/local/lib/opensc-pkcs11.so
     name = opensc
+
+### Print
+
+Prints the human-readable JSON representation of each signed trust anchor passed, contained in a JSON array. If no signed trust anchors are passed, an empty array is printed.
+
+    ... print [trust-anchor.jwt [...]]
 
 ## Support and raising issues
 
