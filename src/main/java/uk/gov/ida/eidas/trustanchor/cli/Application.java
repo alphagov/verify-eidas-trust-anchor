@@ -6,6 +6,7 @@ import picocli.CommandLine.RunLast;
 
 @Command(name="tasign", description="Signs trust anchors", subcommands={
   Import.class,
+  Print.class,
   SignWithFile.class,
   SignWithSmartcard.class})
 class Application implements Runnable {
