@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 public class SignerTest {
 
     @Test
-    public void testSignerThrowsExceptionWhenInputFileNotReadable() throws Exception {
+    public void testSignerThrowsExceptionWhenInputFileNotReadable() {
 
         PrivateKey key = mock(PrivateKey.class);
         X509Certificate certificate = mock(X509Certificate.class);

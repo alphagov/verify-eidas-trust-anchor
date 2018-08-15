@@ -31,6 +31,16 @@ mainClassName = 'uk.gov.ida.eidas.trustanchor.cli.Application'
 def buildVersion = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
 version = "$buildVersion"
 
+ext {
+    opensaml = '3.3.0'
+}
+
+
+def dependencyVersions = [
+        opensaml:"$opensaml",
+        saml_libs_version: "$opensaml-157"
+]
+
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
@@ -46,7 +56,11 @@ dependencies {
     compile 'com.nimbusds:nimbus-jose-jwt:5.4',
             'info.picocli:picocli:2.2.2',
             'org.json:json:20180130',
-            'com.google.guava:guava:23.1-jre'
+            'com.google.guava:guava:23.1-jre',
+
+            "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
+            "org.opensaml:opensaml-saml-api:$dependencyVersions.opensaml",
+            "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version"
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-32',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',
