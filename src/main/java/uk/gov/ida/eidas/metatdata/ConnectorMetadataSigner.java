@@ -20,7 +20,7 @@ public class ConnectorMetadataSigner {
         this.certificate = certificate;
     }
 
-    public String sign(String metadataString) throws CertificateEncodingException, XMLParserException, UnmarshallingException {
+    public SignableSAMLObject sign(String metadataString) throws CertificateEncodingException, XMLParserException, UnmarshallingException {
         SamlObjectParser sop = new SamlObjectParser();
         SignableSAMLObject metadata = sop.getSamlObject(metadataString);
 
@@ -32,7 +32,6 @@ public class ConnectorMetadataSigner {
                 XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256_MGF1);
         samlObjectSigner.sign(metadata);
 
-        SamlObjectMarshaller marshaller = new SamlObjectMarshaller();
-        return marshaller.transformToString(metadata);
+        return metadata;
     }
 }

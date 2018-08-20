@@ -2,11 +2,14 @@ package uk.gov.ida.eidas.metadata;
 
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.xml.security.signature.XMLSignature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.io.UnmarshallingException;
+import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.xmlsec.signature.Signature;
 import uk.gov.ida.common.shared.security.PrivateKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
@@ -21,6 +24,8 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConnectorMetadataSignerTest {
@@ -39,12 +44,16 @@ public class ConnectorMetadataSignerTest {
 
     @Test
     public void shouldSignMetadata() throws IOException, CertificateEncodingException, XMLParserException, UnmarshallingException {
-
         String metadataString = loadMetadataString("metadata/unsigned/metadata.xml");
-        String signedMetadata = new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(metadataString);
+
+        SignableSAMLObject signedMetadata = new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(metadataString);
+        Signature signature = signedMetadata.getSignature();
 
         assertThat(metadataString).doesNotContain(Base64.encodeBase64String(certificateForSigning.getEncoded()));
-        assertThat(signedMetadata).contains(Base64.encodeBase64String(certificateForSigning.getEncoded()));
+        assertTrue(signedMetadata.isSigned());
+        assertEquals(privateKeyForSigning, signature.getSigningCredential().getPrivateKey());
+        assertEquals(certificateForSigning.getPublicKey(), signature.getSigningCredential().getPublicKey());
+        assertEquals(XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256_MGF1, signature.getSignatureAlgorithm());
     }
 
     @Test

@@ -1,8 +1,10 @@
 package uk.gov.ida.eidas.metatdata.cli;
 
+import org.opensaml.saml.common.SignableSAMLObject;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
+import uk.gov.ida.eidas.metatdata.SamlObjectMarshaller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +32,10 @@ abstract class SigningCommand {
 
         String metadataString = new String(Files.readAllBytes(inputFile.toPath()), "UTF-8");
 
-        String signedMetadata = new ConnectorMetadataSigner(key, certificate).sign(metadataString);
+        SignableSAMLObject signedMetadataObject = new ConnectorMetadataSigner(key, certificate).sign(metadataString);
+
+        SamlObjectMarshaller marshaller = new SamlObjectMarshaller();
+        String signedMetadata = marshaller.transformToString(signedMetadataObject);
 
         final OutputStreamWriter output = (outputFile == null ? new OutputStreamWriter(System.out) : new FileWriter(outputFile));
         output.write(signedMetadata);
