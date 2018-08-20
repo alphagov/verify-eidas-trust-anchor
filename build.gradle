@@ -60,7 +60,8 @@ dependencies {
 
             "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
             "org.opensaml:opensaml-saml-api:$dependencyVersions.opensaml",
-            "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version"
+            "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version",
+            "uk.gov.ida:saml-security:$dependencyVersions.saml_libs_version"
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-32',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',
