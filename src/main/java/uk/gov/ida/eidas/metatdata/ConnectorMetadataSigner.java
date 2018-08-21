@@ -15,7 +15,7 @@ public class ConnectorMetadataSigner {
     private PrivateKey key;
     private X509Certificate certificate;
 
-    public ConnectorMetadataSigner(PrivateKey key, X509Certificate certificate) {
+    public ConnectorMetadataSigner(X509Certificate certificate, PrivateKey key) {
         this.key = key;
         this.certificate = certificate;
     }

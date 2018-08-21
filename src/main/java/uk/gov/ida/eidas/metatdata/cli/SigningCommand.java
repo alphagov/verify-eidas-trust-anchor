@@ -35,7 +35,7 @@ abstract class SigningCommand {
 
         String metadataString = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
 
-        SignableSAMLObject signedMetadataObject = new ConnectorMetadataSigner(key, certificate).sign(metadataString);
+        SignableSAMLObject signedMetadataObject = new ConnectorMetadataSigner(certificate, key).sign(metadataString);
 
         boolean valid = new MetadataSignatureValidator(certificate.getPublicKey(), key).validate(signedMetadataObject);
         if(!valid) throw new SignatureException("Unable to sign Connector Metadata");

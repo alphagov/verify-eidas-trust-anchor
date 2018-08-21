@@ -46,7 +46,7 @@ public class ConnectorMetadataSignerTest {
     public void shouldSignMetadata() throws IOException, CertificateEncodingException, XMLParserException, UnmarshallingException {
         String metadataString = loadMetadataString("metadata/unsigned/metadata.xml");
 
-        SignableSAMLObject signedMetadata = new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(metadataString);
+        SignableSAMLObject signedMetadata = new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(metadataString);
         Signature signature = signedMetadata.getSignature();
 
         assertThat(metadataString).doesNotContain(Base64.encodeBase64String(certificateForSigning.getEncoded()));
@@ -59,20 +59,20 @@ public class ConnectorMetadataSignerTest {
     @Test
     public void shouldErrorWhenMetadataEmpty() {
         assertThrows(XMLParserException.class,
-                ()->new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(""));
+                ()->new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(""));
     }
 
     @Test
     public void shouldErrorWhenMetadataNull() {
         assertThrows(NullPointerException.class,
-                ()->new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(null));
+                ()->new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(null));
     }
 
     @Test
     public void shouldErrorWhenMetadataInvalid() throws IOException {
         String metadataString = loadMetadataString("metadata/unsigned/bad-metadata.xml");
         assertThrows(UnmarshallingException.class,
-                ()->new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(metadataString));
+                ()->new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(metadataString));
     }
 
     private String loadMetadataString(String resourceFilePath) throws IOException {

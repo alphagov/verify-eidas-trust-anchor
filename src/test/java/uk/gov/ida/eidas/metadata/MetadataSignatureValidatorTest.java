@@ -69,6 +69,6 @@ public class MetadataSignatureValidatorTest {
 
         String metadataString = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
 
-        return new ConnectorMetadataSigner(privateKeyForSigning, certificateForSigning).sign(metadataString);
+        return new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(metadataString);
     }
 }
