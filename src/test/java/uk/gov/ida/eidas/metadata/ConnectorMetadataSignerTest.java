@@ -29,8 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ConnectorMetadataSignerTest {
 
-    PrivateKey privateKeyForSigning;
-    X509Certificate certificateForSigning;
+    private PrivateKey privateKeyForSigning;
+    private X509Certificate certificateForSigning;
 
     @BeforeEach
     void setUp() throws InitializationException {

@@ -1,5 +1,6 @@
 package uk.gov.ida.eidas.metadata.cli;
 
+import org.opensaml.core.config.InitializationService;
 import org.opensaml.saml.common.SignableSAMLObject;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
@@ -13,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 
@@ -31,6 +33,9 @@ abstract class SigningCommand {
         if (outputFile != null && !(outputFile.canWrite() || (!outputFile.exists() && outputFile.getAbsoluteFile().getParentFile().canWrite()))) {
             throw new FileNotFoundException("Cannot write to output file: " + outputFile.getAbsolutePath());
         }
+
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        InitializationService.initialize();
 
         String metadataString = FileReader.readFileContent(inputFile);
 

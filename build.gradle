@@ -20,14 +20,13 @@ buildscript {
 plugins { id "com.jfrog.bintray" version "1.8.0" }
 
 apply plugin: 'java'
-apply plugin: 'idaJar'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
-mainClassName = 'uk.gov.ida.eidas.trustanchor.cli.Application'
+mainClassName = 'uk.gov.ida.eidas.Application'
 def buildVersion = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
 version = "$buildVersion"
 
@@ -37,8 +36,8 @@ ext {
 
 
 def dependencyVersions = [
-        opensaml:"$opensaml",
-        saml_libs_version: "$opensaml-157"
+    opensaml:"$opensaml",
+    saml_libs_version: "$opensaml-157"
 ]
 
 repositories {
@@ -71,58 +70,5 @@ dependencies {
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0',
             'org.junit.platform:junit-platform-launcher:1.0.1'
-}
-
-task copyToLib(dependsOn: jar, type: Copy) {
-    into "$buildDir/output/lib"
-    from configurations.runtime
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
-    }
-    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    repositories {
-        maven {
-            url '/srv/maven'
-        }
-    }
-
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            groupId = 'uk.gov.ida.eidas'
-            artifactId = 'trust-anchor'
-
-            artifact sourceJar {
-                classifier 'sources'
-            }
-        }
-    }
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_API_KEY')
-    publications = ['mavenJava']
-    publish = true
-    pkg {
-        repo = 'maven-test'
-        name = 'verify-eidas-trust-anchor'
-        userOrg = 'alphagov'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/alphagov/verify-dev-pki.git'
-        version {
-            name = "$buildVersion"
-        }
-    }
 }
 

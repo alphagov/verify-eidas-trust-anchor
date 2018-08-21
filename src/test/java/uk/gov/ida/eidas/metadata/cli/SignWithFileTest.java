@@ -4,8 +4,6 @@ import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensaml.core.config.InitializationException;
-import org.opensaml.core.config.InitializationService;
 import picocli.CommandLine;
 import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.saml.core.test.PemCertificateStrings;
@@ -34,10 +32,9 @@ public class SignWithFileTest {
     private String outputFilePath;
 
     @BeforeEach
-    public void setUp() throws IOException, InitializationException {
+    public void setUp() throws IOException {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        InitializationService.initialize();
-
+        
         String resourceDir = this.getClass().getClassLoader().getResource("metadata/").getPath();
         outputFilePath = resourceDir + "signed-metadata.xml";
         keyFilePath = resourceDir + "keyFile";
