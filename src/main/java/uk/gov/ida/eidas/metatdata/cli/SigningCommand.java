@@ -5,13 +5,16 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
 import uk.gov.ida.eidas.metatdata.SamlObjectMarshaller;
+import uk.gov.ida.eidas.metatdata.MetadataSignatureValidator;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.PrivateKey;
+import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 
 abstract class SigningCommand {
@@ -30,9 +33,12 @@ abstract class SigningCommand {
             throw new FileNotFoundException("Cannot write to output file: " + outputFile.getAbsolutePath());
         }
 
-        String metadataString = new String(Files.readAllBytes(inputFile.toPath()), "UTF-8");
+        String metadataString = new String(Files.readAllBytes(inputFile.toPath()), StandardCharsets.UTF_8);
 
         SignableSAMLObject signedMetadataObject = new ConnectorMetadataSigner(key, certificate).sign(metadataString);
+
+        boolean valid = new MetadataSignatureValidator(certificate.getPublicKey(), key).validate(signedMetadataObject);
+        if(!valid) throw new SignatureException("Unable to sign Connector Metadata");
 
         SamlObjectMarshaller marshaller = new SamlObjectMarshaller();
         String signedMetadata = marshaller.transformToString(signedMetadataObject);
