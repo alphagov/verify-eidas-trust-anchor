@@ -12,8 +12,6 @@ import org.opensaml.security.SecurityException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.common.shared.security.PrivateKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
-import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
-import uk.gov.ida.eidas.metatdata.MetadataSignatureValidator;
 import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 

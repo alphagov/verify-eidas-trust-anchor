@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.metatdata;
+package uk.gov.ida.eidas.metadata;
 
 import net.shibboleth.utilities.java.support.resolver.Criterion;
 import org.opensaml.saml.common.SignableSAMLObject;

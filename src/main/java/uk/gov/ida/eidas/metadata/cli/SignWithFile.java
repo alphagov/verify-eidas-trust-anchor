@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.metatdata.cli;
+package uk.gov.ida.eidas.metadata.cli;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;

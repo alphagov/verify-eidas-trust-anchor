@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.metatdata.saml;
+package uk.gov.ida.eidas.metadata.saml;
 
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
 import org.opensaml.core.xml.io.Marshaller;

@@ -8,7 +8,6 @@ import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import picocli.CommandLine;
 import uk.gov.ida.eidas.utils.FileReader;
-import uk.gov.ida.eidas.metatdata.cli.SignWithFile;
 import uk.gov.ida.saml.core.test.PemCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 

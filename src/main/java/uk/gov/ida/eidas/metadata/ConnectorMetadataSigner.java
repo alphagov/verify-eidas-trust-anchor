@@ -1,10 +1,10 @@
-package uk.gov.ida.eidas.metatdata;
+package uk.gov.ida.eidas.metadata;
 
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
-import uk.gov.ida.eidas.metatdata.saml.SamlObjectSigner;
+import uk.gov.ida.eidas.metadata.saml.SamlObjectSigner;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
 
 import java.security.PrivateKey;

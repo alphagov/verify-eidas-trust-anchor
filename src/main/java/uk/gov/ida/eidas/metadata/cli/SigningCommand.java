@@ -1,11 +1,11 @@
-package uk.gov.ida.eidas.metatdata.cli;
+package uk.gov.ida.eidas.metadata.cli;
 
 import org.opensaml.saml.common.SignableSAMLObject;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
-import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
-import uk.gov.ida.eidas.metatdata.MetadataSignatureValidator;
-import uk.gov.ida.eidas.metatdata.saml.SamlObjectMarshaller;
+import uk.gov.ida.eidas.metadata.ConnectorMetadataSigner;
+import uk.gov.ida.eidas.metadata.MetadataSignatureValidator;
+import uk.gov.ida.eidas.metadata.saml.SamlObjectMarshaller;
 import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
