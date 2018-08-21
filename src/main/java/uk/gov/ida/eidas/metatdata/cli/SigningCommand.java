@@ -4,8 +4,8 @@ import org.opensaml.saml.common.SignableSAMLObject;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
-import uk.gov.ida.eidas.metatdata.SamlObjectMarshaller;
 import uk.gov.ida.eidas.metatdata.MetadataSignatureValidator;
+import uk.gov.ida.eidas.metatdata.saml.SamlObjectMarshaller;
 
 import java.io.File;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.metatdata;
+package uk.gov.ida.eidas.metatdata.saml;
 
 import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.io.MarshallingException;
@@ -18,9 +18,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 
 public class SamlObjectSigner {
-    private static final String BEGIN_CERT = "-----BEGIN CERTIFICATE-----";
-    private static final String END_CERT = "-----END CERTIFICATE-----";
-
     private final PublicKey publicKey;
     private final PrivateKey privateKey;
     private final String certificate;
@@ -47,7 +44,6 @@ public class SamlObjectSigner {
     }
 
     private Signature buildSignature() {
-
         Signature signature = build(Signature.DEFAULT_ELEMENT_NAME);
         signature.setSignatureAlgorithm(signatureAlgorithm);
         signature.setSigningCredential(new BasicCredential(publicKey, privateKey));
@@ -61,9 +57,10 @@ public class SamlObjectSigner {
         X509Data x509Data = build(X509Data.DEFAULT_ELEMENT_NAME);
         X509Certificate x509Certificate = build(X509Certificate.DEFAULT_ELEMENT_NAME);
 
-        x509Certificate.setValue(certificate.replace(BEGIN_CERT, "").replace(END_CERT, ""));
+        x509Certificate.setValue(certificate);
         x509Data.getX509Certificates().add(x509Certificate);
         keyInfo.getX509Datas().add(x509Data);
+
         return keyInfo;
     }
 
