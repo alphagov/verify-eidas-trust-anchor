@@ -14,12 +14,11 @@ import uk.gov.ida.common.shared.security.PrivateKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.eidas.metatdata.ConnectorMetadataSigner;
 import uk.gov.ida.eidas.metatdata.MetadataSignatureValidator;
+import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
@@ -67,7 +66,7 @@ public class MetadataSignatureValidatorTest {
         ClassLoader classLoader = this.getClass().getClassLoader();
         File file = new File(classLoader.getResource(resourceFilePath).getFile());
 
-        String metadataString = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        String metadataString = FileReader.readFileContent(file);
 
         return new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(metadataString);
     }

@@ -1,10 +1,10 @@
 package uk.gov.ida.eidas.trustanchor.cli;
 
 import com.nimbusds.jose.JOSEException;
+import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.eidas.trustanchor.Generator;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.security.PrivateKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
@@ -44,7 +44,7 @@ public class Signer {
 
     List<String> inputs = new ArrayList<>(inputFiles.size());
     for (File input : inputFiles) {
-      inputs.add(new String(Files.readAllBytes(input.toPath())));
+      inputs.add(FileReader.readFileContent(input));
     }
     final Generator generator = new Generator(key, certificate);
     final String generatedAnchors = generator.generate(inputs).serialize();

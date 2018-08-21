@@ -6,12 +6,12 @@ import org.json.JSONArray;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
+import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -31,7 +31,7 @@ class Print implements Callable<Void> {
         JSONArray anchorObjects = new JSONArray();
 
         for (File anchor : anchors) {
-            String encodedJwsObject = new String(Files.readAllBytes(anchor.toPath()));
+            String encodedJwsObject = FileReader.readFileContent(anchor);
             anchorObjects.put(JWSObject.parse(encodedJwsObject).getPayload().toJSONObject());
         }
 

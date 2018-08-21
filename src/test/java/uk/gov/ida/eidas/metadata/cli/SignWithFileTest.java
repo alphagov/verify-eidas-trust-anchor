@@ -7,15 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import picocli.CommandLine;
+import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.eidas.metatdata.cli.SignWithFile;
 import uk.gov.ida.saml.core.test.PemCertificateStrings;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.Security;
 import java.util.Base64;
 
@@ -70,7 +68,7 @@ public class SignWithFileTest {
             metadataFilePath
         );
 
-        String signedMetadata = new String(Files.readAllBytes(Paths.get(outputFilePath)), StandardCharsets.UTF_8);
+        String signedMetadata = FileReader.readFileContent(outputFilePath);
         assertThat(signedMetadata).contains(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT.replaceAll("\n", ""));
     }
 
