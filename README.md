@@ -1,8 +1,9 @@
-Verify eIDAS Trust Anchor Generator
+Verify eIDAS Trust Anchor Generator and Connector Metadata Signer
 ===================================
 
 [![Build Status](https://travis-ci.org/alphagov/verify-eidas-trust-anchor.svg?branch=master)](https://travis-ci.org/alphagov/verify-eidas-trust-anchor)
 
+### About Trust Anchor
 [European identity schemes](https://ec.europa.eu/digital-single-market/en/e-identification) each have unique metadata containing their identity providers and public keys. Every metadata file is signed with a country-specific key which allows metadata consumers to trust its authenticity.
 
 We collect certificates for connected European countries into one place and sign them all together with a Verify key.
@@ -11,11 +12,25 @@ Our relying parties can trust the collection of certificates because of the [GOV
 
 GOV.UK Verify expresses these anchors as [JSON Web Keys (JWK)](https://tools.ietf.org/html/rfc7517) and serves them signed in compact [JSON Web Signature (JWS)](https://tools.ietf.org/html/rfc7515) format.
 
+### About Connector Metadata Signer
+
+eIDAS specifies that we can only sign with RSASSA-PSS or ECDSA. Since our keys are RSA keys, we decided to go with the RSASSA-PSS algorithm. 
+
+However, since xmlsectool does not support RSASSA-PSS, we had to create this signer to sign Connector Metadata. 
+
+Further work can probably be done to parameterise the signing algorithm that will enable this tool to sign any metadata, and bring the metadata signing process inline with this one.
+
+
+## This tool
 This tool can:
-* generate trust anchors from a country's certificate
-* aggregate many trust anchors together
-* sign the aggregated anchors into a full signed trust anchor
-* print a full signed trust anchor to show its constituent keys
+* Operate on Trust Anchors
+  * generate trust anchors from a country's certificate
+  * aggregate many trust anchors together
+  * sign the aggregated anchors into a full signed trust anchor
+  * print a full signed trust anchor to show its constituent keys
+* Operate on Connector Metadata
+  * sign the metadata using RSASSA-PSS algorithm and validate the signed signature.
+    * Currently it is unable to sign using the smartcard
 
 ## Build
 
@@ -33,29 +48,30 @@ If you make changes, run the tests.
 
 ## Run
 
-The build process will produce a JAR artifact which accepts multiple commands. All of the following commands are assumed to be prefixed with:
-
-    java -jar verify-trust-anchor.jar ...
-
+The build process will produce a zip containing the executable (under bin/) under build/distributions. 
+ 
 All commands by default will output to standard out. You can pass the `--output <file>` or `-o <file>` option to output to a file instead.
 
-### Import
+### Import Trust Anchor
 
 Generates a country's trust anchor by supplying the location of its metadata and its certificate or multiple certificates if the country has a certificate chain.
 
-    ... import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
+    ./verify-trust-anchor trust-anchor import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
 
-### Sign with file
+### Sign Trust Anchor with file
 
 Aggregates and signs a collection of trust anchors by using a RSA private key supplied by a file. You can specify as many trust anchors as desired, including none.
 
-    ... sign-with-file --key path/to/private-key.pk8 --cert path/to/public-cert.crt [country1.jwk [country2.jwk [...]]]
+    ./verify-trust-anchor trust-anchor sign-with-file \
+      --key path/to/private-key.pk8 \
+      --cert path/to/public-cert.crt \
+      [country1.jwk [country2.jwk [...]]]
 
-### Sign with smartcard
+### Sign Trust Anchor with smartcard
 
 Aggregates and signs a collection of trust anchors by using a smartcard (such as a Yubikey) that can be accessed using PKCS11.
 
-    ... sign-with-smartcard \
+    ./verify-trust-anchor trust-anchor sign-with-smartcard \
       --config pkcs11_config.txt \
       --key "Private Key alias" \
       --cert "Public Certificate alias" \
@@ -66,11 +82,20 @@ This requires an external native library, such as [OpenSC](https://github.com/op
     library = /usr/local/lib/opensc-pkcs11.so
     name = opensc
 
-### Print
+### Print Trust Anchor
 
 Prints the human-readable JSON representation of each signed trust anchor passed, contained in a JSON array. If no signed trust anchors are passed, an empty array is printed.
 
-    ... print [trust-anchor.jwt [...]]
+    ./verify-trust-anchor trust-anchor print [trust-anchor.jwt [...]]
+
+### Sign Connector Metadata ile
+
+Signs a metadata.xml file by using a RSA private key and its corresponding cert supplied by a file. 
+
+    ./verify-trust-anchor connector-metadata sign-with-file \
+      --key path/to/private-key.pk8 \
+      --cert path/to/public-cert.crt \
+      metadata.xml
 
 ## Support and raising issues
 

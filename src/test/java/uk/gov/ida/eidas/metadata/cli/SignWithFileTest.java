@@ -34,7 +34,7 @@ public class SignWithFileTest {
     @BeforeEach
     public void setUp() throws IOException {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-        
+
         String resourceDir = this.getClass().getClassLoader().getResource("metadata/").getPath();
         outputFilePath = resourceDir + "signed-metadata.xml";
         keyFilePath = resourceDir + "keyFile";

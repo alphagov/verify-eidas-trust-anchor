@@ -27,7 +27,7 @@ public class MetadataSignatureValidator extends SignatureValidator {
     private final Credential credential;
 
     public MetadataSignatureValidator(PublicKey publickey, PrivateKey privateKey) {
-        this.credential = getSigningCredential(publickey, privateKey);;
+        this.credential = getSigningCredential(publickey, privateKey);
     }
 
     public boolean validate(SignableSAMLObject signableSAMLObject) throws SignatureException, SecurityException {

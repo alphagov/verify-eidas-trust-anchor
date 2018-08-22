@@ -3,12 +3,12 @@ package uk.gov.ida.eidas.trustanchor.cli;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name="sign-trust-anchor", description="Signs trust anchors", subcommands={
+@Command(name="trust-anchor", description="Generates and Signs trust anchors. You can also choose to print the content of encoded trust anchors.", subcommands={
   Import.class,
   Print.class,
   SignWithFile.class,
   SignWithSmartcard.class})
-public class TrustAnchorSigningApplication implements Runnable {
+public class TrustAnchorGenerationApplication implements Runnable {
   @Override
   public void run() {
     // If we reach this point, we didn't match any subcommands.
