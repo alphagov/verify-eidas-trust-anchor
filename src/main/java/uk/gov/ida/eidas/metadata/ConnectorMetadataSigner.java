@@ -30,7 +30,7 @@ public class ConnectorMetadataSigner {
                 this.certificate.getPublicKey(),
                 key,
                 certificateString,
-                XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256_MGF1);
+                XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA256);
         samlObjectSigner.sign(metadata);
 
         return metadata;

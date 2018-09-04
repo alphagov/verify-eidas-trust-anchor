@@ -37,7 +37,7 @@ ext {
 
 def dependencyVersions = [
     opensaml:"$opensaml",
-    saml_libs_version: "$opensaml-157"
+    saml_libs_version: "$opensaml-158"
 ]
 
 repositories {

@@ -1,17 +1,20 @@
 package uk.gov.ida.eidas.metadata.cli;
 
-import org.apache.commons.io.FileUtils;
+import com.google.common.io.Resources;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
 import picocli.CommandLine;
+import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.eidas.utils.FileReader;
-import uk.gov.ida.saml.core.test.PemCertificateStrings;
-import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.Security;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,74 +23,59 @@ import static org.junit.Assert.fail;
 
 public class SignWithFileTest {
 
-    private File keyFile;
-    private File certFile;
-    private File wrongCertFile;
-
-    private String keyFilePath;
-    private String certFilePath;
-    private String wrongCertFilePath;
-
     private String metadataFilePath;
     private String outputFilePath;
+    private String keyPath;
+    private String certPath;
+    private String wrongCertPath;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() throws InitializationException {
+        InitializationService.initialize();
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
-        String resourceDir = this.getClass().getClassLoader().getResource("metadata/").getPath();
-        outputFilePath = resourceDir + "signed-metadata.xml";
-        keyFilePath = resourceDir + "keyFile";
-        certFilePath = resourceDir + "certFile";
-        wrongCertFilePath = resourceDir + "wrongCertFile";
-        metadataFilePath = resourceDir + "unsigned/metadata.xml";
+        keyPath = Resources.getResource("pki/ecdsa.test.pk8").getPath();
+        certPath = Resources.getResource("pki/ecdsa.test.crt").getPath();
+        wrongCertPath = Resources.getResource("pki/diff_ecdsa.test.crt").getPath();
 
-        keyFile = writeToFile(keyFilePath, Base64.getDecoder().decode(TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY));
-        certFile = writeToFile(certFilePath, PemCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT.getBytes());
-        wrongCertFile = writeToFile(wrongCertFilePath, PemCertificateStrings.METADATA_SIGNING_B_PUBLIC_CERT.getBytes());
+        String resourceDir = Resources.getResource("metadata/").getPath();
+        outputFilePath = resourceDir + "signed-metadata.xml";
+        metadataFilePath = resourceDir + "unsigned/metadata.xml";
     }
 
     @AfterEach
     public void tearDown(){
-        keyFile.delete();
-        certFile.delete();
-        wrongCertFile.delete();
         new File(outputFilePath).delete();
     }
 
     @Test
-    public void shouldSignMetadata() throws IOException {
+    public void shouldWriteSignedMetadataToFile() throws IOException, CertificateEncodingException {
         CommandLine.call(new SignWithFile(), null,
-            "--key=" + keyFilePath,
-            "--cert=" + certFilePath,
+            "--key=" + keyPath,
+            "--cert=" + certPath,
             "-o=" + outputFilePath,
             metadataFilePath
         );
 
         String signedMetadata = FileReader.readFileContent(outputFilePath);
-        assertThat(signedMetadata).contains(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT.replaceAll("\n", ""));
+        X509Certificate certificate = new X509CertificateFactory().createCertificate(FileReader.readFileContent(certPath));
+        assertThat(signedMetadata).contains(Base64.getEncoder().encodeToString(certificate.getEncoded()));
     }
 
     @Test
-    public void shouldErrorAndNotWriteToFileIfMetadataNotSigned() {
+    public void shouldNotWriteToFileOnSigningError() {
         try {
             CommandLine.call(new SignWithFile(), null,
-                "--key=" + keyFilePath,
-                "--cert=" + wrongCertFilePath,
+                "--key=" + keyPath,
+                "--cert=" + wrongCertPath,
                 "-o=" + outputFilePath,
                 metadataFilePath
             );
-            fail();
+            fail("should have errored when signing with wrong cert");
         } catch (Exception exception) {
             assertThat(exception.getMessage()).contains("SignatureException");
             assertThat(exception.getMessage()).contains("Unable to sign Connector Metadata");
             assertFalse("Should not create signed metadata file", new File(outputFilePath).exists());
         }
-    }
-
-    private static File writeToFile(String filename, byte[] fileContent) throws IOException {
-        File file = new File(filename);
-        FileUtils.writeByteArrayToFile(file, fileContent);
-        return file;
     }
 }

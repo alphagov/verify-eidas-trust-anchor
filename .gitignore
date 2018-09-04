@@ -22,3 +22,5 @@ out/
 .DS_Store
 *~
 \#*#
+!*.test.crt
+!*.test.pk8

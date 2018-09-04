@@ -18,7 +18,7 @@ public class SignWithFile extends SigningCommand implements Callable<Void> {
 
   @Override
   public Void call() throws Exception {
-    RSAPrivateKey key = FileKeyLoader.load(keyFile);
+    RSAPrivateKey key = FileKeyLoader.loadRSAKey(keyFile);
     X509Certificate x509Certificate = FileKeyLoader.loadCert(certificateFile);
     return build(key, x509Certificate);
   }

@@ -6,6 +6,7 @@ import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
 
 import java.io.File;
 import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.RSAPrivateKey;
 import java.util.concurrent.Callable;
 
@@ -20,7 +21,7 @@ public class SignWithFile extends SigningCommand implements Callable<Void> {
 
   @Override
   public Void call() throws Exception {
-    RSAPrivateKey key = FileKeyLoader.load(keyFile);
+    ECPrivateKey key = FileKeyLoader.loadECKey(keyFile);
     X509Certificate x509Certificate = FileKeyLoader.loadCert(certificateFile);
     return build(key, x509Certificate);
   }

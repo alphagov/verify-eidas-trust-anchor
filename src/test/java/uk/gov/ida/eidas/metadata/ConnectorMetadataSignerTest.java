@@ -1,8 +1,8 @@
 package uk.gov.ida.eidas.metadata;
 
+import com.google.common.io.Resources;
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.xml.security.signature.XMLSignature;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.config.InitializationException;
@@ -10,17 +10,19 @@ import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.xmlsec.signature.Signature;
-import uk.gov.ida.common.shared.security.PrivateKeyFactory;
-import uk.gov.ida.common.shared.security.X509CertificateFactory;
+import org.opensaml.xmlsec.signature.support.SignatureConstants;
+import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
 import uk.gov.ida.eidas.utils.FileReader;
-import uk.gov.ida.saml.core.test.TestCertificateStrings;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.security.spec.InvalidKeySpecException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -33,12 +35,12 @@ public class ConnectorMetadataSignerTest {
     private X509Certificate certificateForSigning;
 
     @BeforeEach
-    void setUp() throws InitializationException {
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+    void setUp() throws InitializationException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
         InitializationService.initialize();
-        privateKeyForSigning = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY));
-        certificateForSigning = new X509CertificateFactory().createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
+        privateKeyForSigning = FileKeyLoader.loadECKey(new File(Resources.getResource("pki/ecdsa.test.pk8").getFile()));
+        certificateForSigning = FileKeyLoader.loadCert(new File(Resources.getResource("pki/ecdsa.test.crt").getFile()));
     }
 
     @Test
@@ -52,7 +54,7 @@ public class ConnectorMetadataSignerTest {
         assertTrue(signedMetadata.isSigned());
         assertEquals(privateKeyForSigning, signature.getSigningCredential().getPrivateKey());
         assertEquals(certificateForSigning.getPublicKey(), signature.getSigningCredential().getPublicKey());
-        assertEquals(XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA256_MGF1, signature.getSignatureAlgorithm());
+        assertEquals(SignatureConstants.ALGO_ID_SIGNATURE_ECDSA_SHA256, signature.getSignatureAlgorithm());
     }
 
     @Test
