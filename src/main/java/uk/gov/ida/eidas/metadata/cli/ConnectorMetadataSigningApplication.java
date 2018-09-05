@@ -3,7 +3,10 @@ package uk.gov.ida.eidas.metadata.cli;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 
-@Command(name="connector-metadata", description="Signs Connector Metadata", subcommands={SignWithFile.class})
+@Command(name="connector-metadata", description="Signs Connector Metadata", subcommands={
+    SignWithFile.class,
+    SignWithSmartcard.class
+})
 public class ConnectorMetadataSigningApplication implements Runnable {
     @Override
     public void run() {
