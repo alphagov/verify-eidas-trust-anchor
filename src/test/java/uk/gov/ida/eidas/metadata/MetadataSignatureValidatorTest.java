@@ -1,5 +1,7 @@
 package uk.gov.ida.eidas.metadata;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.google.common.io.Resources;
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,8 +12,9 @@ import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.security.SecurityException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
-import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
+import org.slf4j.LoggerFactory;
 import uk.gov.ida.eidas.utils.FileReader;
+import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +37,9 @@ public class MetadataSignatureValidatorTest {
 
     @BeforeEach
     void setUp() throws InitializationException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.OFF);
+
         InitializationService.initialize();
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 

@@ -1,5 +1,7 @@
 package uk.gov.ida.eidas.metadata;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.google.common.io.Resources;
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.apache.commons.codec.binary.Base64;
@@ -11,8 +13,9 @@ import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.xmlsec.signature.Signature;
 import org.opensaml.xmlsec.signature.support.SignatureConstants;
-import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
+import org.slf4j.LoggerFactory;
 import uk.gov.ida.eidas.utils.FileReader;
+import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +39,9 @@ public class ConnectorMetadataSignerTest {
 
     @BeforeEach
     void setUp() throws InitializationException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.OFF);
+
         InitializationService.initialize();
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 

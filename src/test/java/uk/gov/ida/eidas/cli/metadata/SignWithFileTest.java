@@ -1,11 +1,14 @@
 package uk.gov.ida.eidas.cli.metadata;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
 import uk.gov.ida.eidas.utils.FileReader;
@@ -31,6 +34,9 @@ public class SignWithFileTest {
 
     @BeforeEach
     public void setUp() throws InitializationException {
+        Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.OFF);
+
         InitializationService.initialize();
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
