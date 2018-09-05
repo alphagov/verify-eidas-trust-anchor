@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.trustanchor.cli;
+package uk.gov.ida.eidas.cli.trustanchor;
 
 import com.nimbusds.jose.JOSEException;
 import uk.gov.ida.eidas.utils.FileReader;

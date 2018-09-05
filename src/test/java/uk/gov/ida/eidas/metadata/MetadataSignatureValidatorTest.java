@@ -10,7 +10,7 @@ import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.security.SecurityException;
 import org.opensaml.xmlsec.signature.support.SignatureException;
-import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
+import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;

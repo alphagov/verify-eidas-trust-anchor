@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.trustanchor.cli;
+package uk.gov.ida.eidas.cli.trustanchor;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;

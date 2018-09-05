@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.trustanchor.cli;
+package uk.gov.ida.eidas.cli.trustanchor;
 
 import com.nimbusds.jose.jwk.JWK;
 import org.json.JSONObject;
@@ -6,7 +6,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import uk.gov.ida.eidas.trustanchor.CountryTrustAnchor;
-import uk.gov.ida.eidas.trustanchor.FileKeyLoader;
+import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
 import java.io.File;
 import java.io.FileWriter;

@@ -1,11 +1,11 @@
-package uk.gov.ida.eidas;
+package uk.gov.ida.eidas.cli;
 
 import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import uk.gov.ida.eidas.metadata.cli.ConnectorMetadataSigningApplication;
-import uk.gov.ida.eidas.trustanchor.cli.TrustAnchorGenerationApplication;
+import uk.gov.ida.eidas.cli.metadata.ConnectorMetadataSigningApplication;
+import uk.gov.ida.eidas.cli.trustanchor.TrustAnchorGenerationApplication;
 
 import java.security.Security;
 

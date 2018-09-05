@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.metadata.cli;
+package uk.gov.ida.eidas.cli.metadata;
 
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.AfterEach;

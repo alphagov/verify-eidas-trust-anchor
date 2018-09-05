@@ -1,6 +1,5 @@
-package uk.gov.ida.eidas.metadata.cli;
+package uk.gov.ida.eidas.cli.metadata;
 
-import org.opensaml.core.config.InitializationService;
 import org.opensaml.saml.common.SignableSAMLObject;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
