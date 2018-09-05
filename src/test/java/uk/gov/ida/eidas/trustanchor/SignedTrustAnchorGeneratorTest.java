@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.cli.trustanchor;
+package uk.gov.ida.eidas.trustanchor;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +13,7 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SignerTest {
+public class SignedTrustAnchorGeneratorTest {
 
     @Test
     public void testSignerThrowsExceptionWhenInputFileNotReadable() {
@@ -28,8 +28,8 @@ public class SignerTest {
 
         File outputFile = mock(File.class);
 
-        Signer signer = new Signer(key, certificate, inputFiles, outputFile);
+        SignedTrustAnchorGenerator signer = new SignedTrustAnchorGenerator(key, certificate, inputFiles, outputFile);
 
-        Assertions.assertThrows(FileNotFoundException.class, signer::sign);
+        Assertions.assertThrows(FileNotFoundException.class, signer::generate);
     }
 }

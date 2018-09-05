@@ -1,16 +1,16 @@
 package uk.gov.ida.eidas.cli.trustanchor;
 
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
+import uk.gov.ida.eidas.utils.keyloader.PKCS11KeyLoader;
+
 import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.Callable;
 
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
-import uk.gov.ida.eidas.utils.keyloader.PKCS11KeyLoader;
-
 @Command(name="sign-with-smartcard", description="Signs the final key set with a key from a smartcard")
-public class SignWithSmartcard extends SigningCommand implements Callable<Void> {
+public class SignWithSmartcard extends SignTrustAnchor implements Callable<Void> {
   @Option(names = { "--config" }, description = "PKCS#11 configuration passed as a file.\nSee https://tinyurl.com/pkcs11config", required=true)
   private File pkcs11Config;
 

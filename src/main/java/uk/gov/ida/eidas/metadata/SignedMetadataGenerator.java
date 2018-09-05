@@ -1,29 +1,37 @@
-package uk.gov.ida.eidas.cli.metadata;
+package uk.gov.ida.eidas.metadata;
 
+import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
-import uk.gov.ida.eidas.metadata.ConnectorMetadataSigner;
-import uk.gov.ida.eidas.metadata.MetadataSignatureValidator;
+import org.opensaml.security.SecurityException;
 import uk.gov.ida.eidas.metadata.saml.SamlObjectMarshaller;
 import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.security.PrivateKey;
 import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-abstract class SigningCommand {
-    @Parameters(description = "The SAML Metadata XML file to sign.")
-    private File inputFile;
+public class SignedMetadataGenerator {
 
-    @Option(names = {"-o", "--output"}, description = "The file to write the signed SAML Metadata XML to.", required = false)
+    private PrivateKey key;
+    private X509Certificate certificate;
+    private File inputFile;
     private File outputFile;
 
-    public Void build(PrivateKey key, X509Certificate certificate) throws Exception {
+    public SignedMetadataGenerator(PrivateKey key, X509Certificate certificate, File inputFile, File outputFile) {
+        this.key = key;
+        this.certificate = certificate;
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
+    }
+
+    public Void generate() throws IOException, CertificateEncodingException, XMLParserException, UnmarshallingException, org.opensaml.xmlsec.signature.support.SignatureException, SecurityException, SignatureException {
         if (!inputFile.canRead()) {
             throw new FileNotFoundException("Could not read file: " + inputFile.getPath());
         }
@@ -39,8 +47,7 @@ abstract class SigningCommand {
         boolean valid = new MetadataSignatureValidator(certificate.getPublicKey(), key).validate(signedMetadataObject);
         if(!valid) throw new SignatureException("Unable to sign Connector Metadata");
 
-        SamlObjectMarshaller marshaller = new SamlObjectMarshaller();
-        String signedMetadata = marshaller.transformToString(signedMetadataObject);
+        String signedMetadata = new SamlObjectMarshaller().transformToString(signedMetadataObject);
 
         final OutputStreamWriter output = (outputFile == null ? new OutputStreamWriter(System.out) : new FileWriter(outputFile));
         output.write(signedMetadata);

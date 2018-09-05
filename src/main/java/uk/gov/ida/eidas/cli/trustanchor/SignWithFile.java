@@ -1,15 +1,16 @@
 package uk.gov.ida.eidas.cli.trustanchor;
 
-import java.io.File;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.RSAPrivateKey;
-import java.util.concurrent.Callable;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
+import java.io.File;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
+import java.util.concurrent.Callable;
+
 @Command(name="sign-with-file", description="Signs the final key set with a key loaded from a file")
-public class SignWithFile extends SigningCommand implements Callable<Void> {
+public class SignWithFile extends SignTrustAnchor implements Callable<Void> {
   @Option(names = { "--key" }, description = "Location of the private key to use for signing", required=true)
   private File keyFile;
 

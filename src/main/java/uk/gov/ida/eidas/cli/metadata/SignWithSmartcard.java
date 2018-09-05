@@ -10,7 +10,7 @@ import java.security.cert.X509Certificate;
 import java.util.concurrent.Callable;
 
 @Command(name="sign-with-smartcard", description="Signs the final key set with a key from a smartcard")
-public class SignWithSmartcard extends SigningCommand implements Callable<Void> {
+public class SignWithSmartcard extends SignMetadata implements Callable<Void> {
   @Option(names = { "--config" }, description = "PKCS#11 configuration passed as a file.\nSee https://tinyurl.com/pkcs11config", required=true)
   private File pkcs11Config;
 

@@ -10,7 +10,7 @@ import java.security.interfaces.ECPrivateKey;
 import java.util.concurrent.Callable;
 
 @Command(name="sign-with-file", description="Signs the final key set with a key loaded from a file")
-public class SignWithFile extends SigningCommand implements Callable<Void> {
+public class SignWithFile extends SignMetadata implements Callable<Void> {
 
   @Option(names = { "--key" }, description = "Location of the private key to use for signing", required=true)
   private File keyFile;
