@@ -1,7 +1,6 @@
 package uk.gov.ida.eidas.metadata;
 
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
-import org.apache.xml.security.signature.XMLSignature;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import uk.gov.ida.eidas.metadata.saml.SamlObjectSigner;
@@ -15,10 +14,12 @@ import java.util.Base64;
 public class ConnectorMetadataSigner {
     private PrivateKey key;
     private X509Certificate certificate;
+    private AlgorithmType algorithm;
 
-    public ConnectorMetadataSigner(X509Certificate certificate, PrivateKey key) {
+    public ConnectorMetadataSigner(X509Certificate certificate, PrivateKey key, AlgorithmType algorithm) {
         this.key = key;
         this.certificate = certificate;
+        this.algorithm = algorithm;
     }
 
     public SignableSAMLObject sign(String metadataString) throws CertificateEncodingException, XMLParserException, UnmarshallingException {
@@ -30,7 +31,7 @@ public class ConnectorMetadataSigner {
                 this.certificate.getPublicKey(),
                 key,
                 certificateString,
-                XMLSignature.ALGO_ID_SIGNATURE_ECDSA_SHA256);
+                algorithm.getAlgorithmURI());
         samlObjectSigner.sign(metadata);
 
         return metadata;

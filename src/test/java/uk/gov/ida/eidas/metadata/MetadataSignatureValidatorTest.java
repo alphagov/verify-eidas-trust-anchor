@@ -71,6 +71,6 @@ public class MetadataSignatureValidatorTest {
     private SignableSAMLObject loadMetadataAndSign(String resourceFilePath, X509Certificate certificateForSigning) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException {
         File file = new File(Resources.getResource(resourceFilePath).getFile());
         String metadataString = FileReader.readFileContent(file);
-        return new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning).sign(metadataString);
+        return new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning, AlgorithmType.ECDSA).sign(metadataString);
     }
 }

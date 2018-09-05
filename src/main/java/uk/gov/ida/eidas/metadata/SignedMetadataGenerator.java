@@ -21,12 +21,14 @@ public class SignedMetadataGenerator {
 
     private PrivateKey key;
     private X509Certificate certificate;
+    private AlgorithmType algorithm;
     private File inputFile;
     private File outputFile;
 
-    public SignedMetadataGenerator(PrivateKey key, X509Certificate certificate, File inputFile, File outputFile) {
+    public SignedMetadataGenerator(PrivateKey key, X509Certificate certificate, AlgorithmType algorithm, File inputFile, File outputFile) {
         this.key = key;
         this.certificate = certificate;
+        this.algorithm = algorithm;
         this.inputFile = inputFile;
         this.outputFile = outputFile;
     }
@@ -42,7 +44,7 @@ public class SignedMetadataGenerator {
 
         String metadataString = FileReader.readFileContent(inputFile);
 
-        SignableSAMLObject signedMetadataObject = new ConnectorMetadataSigner(certificate, key).sign(metadataString);
+        SignableSAMLObject signedMetadataObject = new ConnectorMetadataSigner(certificate, key, algorithm).sign(metadataString);
 
         boolean valid = new MetadataSignatureValidator(certificate.getPublicKey(), key).validate(signedMetadataObject);
         if(!valid) throw new SignatureException("Unable to sign Connector Metadata");

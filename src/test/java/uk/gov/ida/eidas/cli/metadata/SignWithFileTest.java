@@ -55,10 +55,11 @@ public class SignWithFileTest {
     }
 
     @Test
-    public void shouldWriteSignedMetadataToFile() throws IOException, CertificateEncodingException {
+    public void shouldWriteECDSASignedMetadataToFile() throws IOException, CertificateEncodingException {
         CommandLine.call(new SignWithFile(), null,
             "--key=" + keyPath,
             "--cert=" + certPath,
+            "--algorithm=ECDSA",
             "-o=" + outputFilePath,
             metadataFilePath
         );
@@ -74,6 +75,7 @@ public class SignWithFileTest {
             CommandLine.call(new SignWithFile(), null,
                 "--key=" + keyPath,
                 "--cert=" + wrongCertPath,
+                "--algorithm=ECDSA",
                 "-o=" + outputFilePath,
                 metadataFilePath
             );
