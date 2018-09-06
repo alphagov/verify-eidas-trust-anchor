@@ -34,7 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.gov.ida.eidas.metadata.AlgorithmType.*;
+import static uk.gov.ida.eidas.metadata.AlgorithmType.RSA;
+import static uk.gov.ida.eidas.metadata.AlgorithmType.ECDSA;
 
 public class ConnectorMetadataSignerTest {
 

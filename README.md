@@ -14,12 +14,11 @@ GOV.UK Verify expresses these anchors as [JSON Web Keys (JWK)](https://tools.iet
 
 ### About Connector Metadata Signer
 
-eIDAS specifies that we can only sign with RSASSA-PSS or ECDSA. Since our keys are RSA keys, we decided to go with the RSASSA-PSS algorithm. 
+eIDAS specifies that we can only sign with RSASSA-PSS or ECDSA.  
 
-However, since xmlsectool does not support RSASSA-PSS, we had to create this signer to sign Connector Metadata. 
+However, since xmlsectool does not support either algorithms, we had to create this signer to sign Connector Metadata. 
 
-Further work can probably be done to parameterise the signing algorithm that will enable this tool to sign any metadata, and bring the metadata signing process inline with this one.
-
+Since RSASSA-PSS didn't work for yubikeys, we decided to go for ECDSA.
 
 ## This tool
 This tool can:
@@ -29,8 +28,7 @@ This tool can:
   * sign the aggregated anchors into a full signed trust anchor
   * print a full signed trust anchor to show its constituent keys
 * Operate on Connector Metadata
-  * sign the metadata using RSASSA-PSS algorithm and validate the signed signature.
-    * Currently it is unable to sign using the smartcard
+  * sign the metadata using RSA or ECDSA algorithm and validate the signed signature.
 
 ## Build
 
@@ -88,13 +86,28 @@ Prints the human-readable JSON representation of each signed trust anchor passed
 
     ./verify-trust-anchor trust-anchor print [trust-anchor.jwt [...]]
 
-### Sign Connector Metadata ile
+### Sign Connector Metadata with file
 
-Signs a metadata.xml file by using a RSA private key and its corresponding cert supplied by a file. 
+Signs a metadata.xml file by using private key and its corresponding cert supplied by a file. 
+Supported algorithms "RSA" or "ECDSA".
 
     ./verify-trust-anchor connector-metadata sign-with-file \
       --key path/to/private-key.pk8 \
       --cert path/to/public-cert.crt \
+      --algorithm ECDSA \
+      metadata.xml
+
+### Sign Connector Metadata with Smartcard/Yubikey
+
+Signs a metadata.xml file by using a smartcard (such as a yubikey). 
+Supported algorithms "RSA" or "ECDSA".
+
+    ./verify-trust-anchor connector-metadata sign-with-smartcard \
+      --config pkcs11_config.txt \
+      --key "Private Key alias" \
+      --cert "Public Certificate alias" \
+      --password 12345
+      --algorithm ECDSA \
       metadata.xml
 
 ## Support and raising issues
