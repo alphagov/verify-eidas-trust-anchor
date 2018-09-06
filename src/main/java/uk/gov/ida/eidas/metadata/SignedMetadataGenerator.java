@@ -1,20 +1,15 @@
 package uk.gov.ida.eidas.metadata;
 
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
-import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
-import org.opensaml.security.SecurityException;
 import uk.gov.ida.eidas.metadata.saml.SamlObjectMarshaller;
 import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.security.PrivateKey;
 import java.security.SignatureException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
 public class SignedMetadataGenerator {
@@ -33,7 +28,7 @@ public class SignedMetadataGenerator {
         this.outputFile = outputFile;
     }
 
-    public Void generate() throws IOException, CertificateEncodingException, XMLParserException, UnmarshallingException, org.opensaml.xmlsec.signature.support.SignatureException, SecurityException, SignatureException {
+    public Void generate() throws Exception {
         if (!inputFile.canRead()) {
             throw new FileNotFoundException("Could not read file: " + inputFile.getPath());
         }

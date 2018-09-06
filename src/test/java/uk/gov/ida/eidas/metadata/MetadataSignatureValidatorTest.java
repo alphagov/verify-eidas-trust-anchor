@@ -3,28 +3,18 @@ package uk.gov.ida.eidas.metadata;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import com.google.common.io.Resources;
-import net.shibboleth.utilities.java.support.xml.XMLParserException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensaml.core.config.InitializationException;
 import org.opensaml.core.config.InitializationService;
-import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
-import org.opensaml.security.SecurityException;
-import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.security.spec.InvalidKeySpecException;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -36,7 +26,7 @@ public class MetadataSignatureValidatorTest {
     private X509Certificate wrongCertificate;
 
     @BeforeEach
-    void setUp() throws InitializationException, IOException, NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {
+    void setUp() throws Exception {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.OFF);
 
@@ -49,7 +39,7 @@ public class MetadataSignatureValidatorTest {
     }
 
     @Test
-    public void shouldReturnTrueIfSignatureMatchesKeyPair() throws IOException, SignatureException, SecurityException, XMLParserException, UnmarshallingException, CertificateEncodingException {
+    public void shouldReturnTrueIfSignatureMatchesKeyPair() throws Exception {
         SignableSAMLObject signedMetadataSaml = loadMetadataAndSign("metadata/unsigned/metadata.xml", certificateForSigning);
 
         MetadataSignatureValidator signatureValidator = new MetadataSignatureValidator(certificateForSigning.getPublicKey(), privateKeyForSigning);
@@ -59,7 +49,7 @@ public class MetadataSignatureValidatorTest {
     }
 
     @Test
-    public void shouldReturnFalseIfSignatureDoesNotMatchKeyPair() throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException, SignatureException, SecurityException {
+    public void shouldReturnFalseIfSignatureDoesNotMatchKeyPair() throws Exception {
         SignableSAMLObject signedMetadataSaml = loadMetadataAndSign("metadata/unsigned/metadata.xml", wrongCertificate);
 
         MetadataSignatureValidator signatureValidator = new MetadataSignatureValidator(wrongCertificate.getPublicKey(), privateKeyForSigning);
@@ -68,7 +58,7 @@ public class MetadataSignatureValidatorTest {
         assertFalse(result);
     }
 
-    private SignableSAMLObject loadMetadataAndSign(String resourceFilePath, X509Certificate certificateForSigning) throws IOException, XMLParserException, UnmarshallingException, CertificateEncodingException {
+    private SignableSAMLObject loadMetadataAndSign(String resourceFilePath, X509Certificate certificateForSigning) throws Exception {
         File file = new File(Resources.getResource(resourceFilePath).getFile());
         String metadataString = FileReader.readFileContent(file);
         return new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning, AlgorithmType.ECDSA).sign(metadataString);

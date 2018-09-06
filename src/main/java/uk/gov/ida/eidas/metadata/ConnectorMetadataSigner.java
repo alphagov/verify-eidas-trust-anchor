@@ -1,8 +1,10 @@
 package uk.gov.ida.eidas.metadata;
 
 import net.shibboleth.utilities.java.support.xml.XMLParserException;
+import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
+import org.opensaml.xmlsec.signature.support.SignatureException;
 import uk.gov.ida.eidas.metadata.saml.SamlObjectSigner;
 import uk.gov.ida.saml.deserializers.parser.SamlObjectParser;
 
@@ -22,7 +24,11 @@ public class ConnectorMetadataSigner {
         this.algorithm = algorithm;
     }
 
-    public SignableSAMLObject sign(String metadataString) throws CertificateEncodingException, XMLParserException, UnmarshallingException {
+    public SignableSAMLObject sign(String metadataString) throws CertificateEncodingException,
+                                                                 XMLParserException,
+                                                                 UnmarshallingException,
+                                                                 MarshallingException,
+                                                                 SignatureException {
         SamlObjectParser sop = new SamlObjectParser();
         SignableSAMLObject metadata = sop.getSamlObject(metadataString);
 

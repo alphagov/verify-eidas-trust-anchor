@@ -15,13 +15,9 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.StringWriter;
 
 public class SamlObjectMarshaller {
-    public String transformToString(SAMLObject samlObject) {
-        try {
-            marshallToElement(samlObject);
-            return transformToString(samlObject.getDOM());
-        } catch (MarshallingException | TransformerException e) {
-            throw new RuntimeException(e);
-        }
+    public String transformToString(SAMLObject samlObject) throws MarshallingException, TransformerException {
+        marshallToElement(samlObject);
+        return transformToString(samlObject.getDOM());
     }
 
     public Element marshallToElement(SAMLObject samlObject) throws MarshallingException {

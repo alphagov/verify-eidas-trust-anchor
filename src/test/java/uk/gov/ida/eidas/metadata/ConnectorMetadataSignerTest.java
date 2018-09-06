@@ -26,7 +26,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 
@@ -34,8 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static uk.gov.ida.eidas.metadata.AlgorithmType.RSA;
 import static uk.gov.ida.eidas.metadata.AlgorithmType.ECDSA;
+import static uk.gov.ida.eidas.metadata.AlgorithmType.RSA;
 
 public class ConnectorMetadataSignerTest {
 
@@ -57,7 +56,7 @@ public class ConnectorMetadataSignerTest {
     }
 
     @Test
-    public void shouldSignMetadataWithECDSA() throws CertificateEncodingException, XMLParserException, UnmarshallingException {
+    public void shouldSignMetadataWithECDSA() throws Exception {
         SignableSAMLObject signedMetadata = new ConnectorMetadataSigner(certificateForSigning, privateKeyForSigning, ECDSA).sign(unsignedMetadataString);
         Signature signature = signedMetadata.getSignature();
 
@@ -69,7 +68,7 @@ public class ConnectorMetadataSignerTest {
     }
 
     @Test
-    public void shouldSignMetadataWithRSA() throws CertificateEncodingException, XMLParserException, UnmarshallingException {
+    public void shouldSignMetadataWithRSA() throws Exception {
         privateKeyForSigning = new PrivateKeyFactory().createPrivateKey(Base64.decodeBase64(TestCertificateStrings.METADATA_SIGNING_A_PRIVATE_KEY));
         certificateForSigning = new X509CertificateFactory().createCertificate(TestCertificateStrings.METADATA_SIGNING_A_PUBLIC_CERT);
 

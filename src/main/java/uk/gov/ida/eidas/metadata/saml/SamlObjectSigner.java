@@ -32,15 +32,12 @@ public class SamlObjectSigner {
         this.marshaller = new SamlObjectMarshaller();
     }
 
-    public void sign(SignableSAMLObject signableSAMLObject) {
+    public void sign(SignableSAMLObject signableSAMLObject) throws MarshallingException, SignatureException {
         Signature signature = buildSignature();
         signableSAMLObject.setSignature(signature);
-        try {
-            marshaller.marshallToElement(signableSAMLObject);
-            Signer.signObject(signature);
-        } catch (MarshallingException | SignatureException e) {
-            throw new RuntimeException(e);
-        }
+
+        marshaller.marshallToElement(signableSAMLObject);
+        Signer.signObject(signature);
     }
 
     private Signature buildSignature() {
