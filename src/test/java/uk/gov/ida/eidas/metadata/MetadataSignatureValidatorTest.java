@@ -26,7 +26,7 @@ public class MetadataSignatureValidatorTest {
     private X509Certificate wrongCertificate;
 
     @BeforeEach
-    void setUp() throws Exception {
+    public void setUp() throws Exception {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.OFF);
 

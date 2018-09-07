@@ -1,7 +1,6 @@
 package uk.gov.ida.eidas.trustanchor;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -10,6 +9,7 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,6 +30,6 @@ public class SignedTrustAnchorGeneratorTest {
 
         SignedTrustAnchorGenerator signer = new SignedTrustAnchorGenerator(key, certificate, inputFiles, outputFile);
 
-        Assertions.assertThrows(FileNotFoundException.class, signer::generate);
+        assertThrows(FileNotFoundException.class, signer::generate);
     }
 }
