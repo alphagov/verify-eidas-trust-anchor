@@ -20,16 +20,25 @@ buildscript {
 plugins { id "com.jfrog.bintray" version "1.8.0" }
 
 apply plugin: 'java'
-apply plugin: 'idaJar'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
-mainClassName = 'uk.gov.ida.eidas.trustanchor.cli.Application'
+mainClassName = 'uk.gov.ida.eidas.cli.Application'
 def buildVersion = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
 version = "$buildVersion"
+
+ext {
+    opensaml = '3.3.0'
+}
+
+
+def dependencyVersions = [
+    opensaml:"$opensaml",
+    saml_libs_version: "$opensaml-158"
+]
 
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
@@ -46,7 +55,12 @@ dependencies {
     compile 'com.nimbusds:nimbus-jose-jwt:5.4',
             'info.picocli:picocli:2.2.2',
             'org.json:json:20180130',
-            'com.google.guava:guava:23.1-jre'
+            'com.google.guava:guava:23.1-jre',
+
+            "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
+            "org.opensaml:opensaml-saml-api:$dependencyVersions.opensaml",
+            "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version",
+            "uk.gov.ida:saml-security:$dependencyVersions.saml_libs_version"
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-32',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',
@@ -56,58 +70,5 @@ dependencies {
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0',
             'org.junit.platform:junit-platform-launcher:1.0.1'
-}
-
-task copyToLib(dependsOn: jar, type: Copy) {
-    into "$buildDir/output/lib"
-    from configurations.runtime
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': mainClassName
-    }
-    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
-}
-
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-}
-
-publishing {
-    repositories {
-        maven {
-            url '/srv/maven'
-        }
-    }
-
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-            groupId = 'uk.gov.ida.eidas'
-            artifactId = 'trust-anchor'
-
-            artifact sourceJar {
-                classifier 'sources'
-            }
-        }
-    }
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_API_KEY')
-    publications = ['mavenJava']
-    publish = true
-    pkg {
-        repo = 'maven-test'
-        name = 'verify-eidas-trust-anchor'
-        userOrg = 'alphagov'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/alphagov/verify-dev-pki.git'
-        version {
-            name = "$buildVersion"
-        }
-    }
 }
 

@@ -1,15 +1,16 @@
-package uk.gov.ida.eidas.trustanchor.cli;
+package uk.gov.ida.eidas.cli.trustanchor;
 
-import java.io.*;
+import picocli.CommandLine.Option;
+import picocli.CommandLine.Parameters;
+import uk.gov.ida.eidas.trustanchor.SignedTrustAnchorGenerator;
+
+import java.io.File;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import picocli.CommandLine.Option;
-import picocli.CommandLine.Parameters;
-
-abstract class SigningCommand {
+abstract class SignTrustAnchor {
   @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")
   private List<File> inputFiles = new ArrayList<>();
 
@@ -17,6 +18,6 @@ abstract class SigningCommand {
   private File outputFile;
 
   public Void build(PrivateKey key, X509Certificate certificate) throws Exception {
-    return new Signer(key, certificate, this.inputFiles, this.outputFile).sign();
+    return new SignedTrustAnchorGenerator(key, certificate, inputFiles, outputFile).generate();
   }
 }

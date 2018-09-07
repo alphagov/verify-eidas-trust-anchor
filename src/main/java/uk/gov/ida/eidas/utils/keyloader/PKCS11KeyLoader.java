@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.trustanchor;
+package uk.gov.ida.eidas.utils.keyloader;
 
 import java.io.File;
 import java.io.FileReader;
