@@ -17,7 +17,7 @@ buildscript {
     }
 }
 
-plugins { id "com.jfrog.bintray" version "1.8.0" }
+plugins { id "com.jfrog.bintray" version "1.8.4" }
 
 apply plugin: 'java'
 apply plugin: 'com.github.ben-manes.versions'
@@ -26,12 +26,11 @@ apply plugin: 'maven-publish'
 
 mainClassName = 'uk.gov.ida.eidas.cli.Application'
 def buildVersion = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
-version = "$buildVersion"
+version = buildVersion
 
 ext {
     opensaml = '3.3.0'
 }
-
 
 def dependencyVersions = [
     opensaml:"$opensaml",
@@ -85,6 +84,17 @@ test {
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
+    classifier 'sources'
+}
+
+artifacts {
+    archives sourceJar
+}
+
+distributions {
+    main {
+        baseName = "verify-eidas-trust-anchor"
+    }
 }
 
 publishing {
@@ -97,12 +107,10 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            groupId = 'uk.gov.ida.eidas'
-            artifactId = 'trust-anchor'
 
-            artifact sourceJar {
-                classifier 'sources'
-            }
+            groupId 'uk.gov.ida.eidas'
+            artifactId 'trust-anchor'
+            version buildVersion
         }
     }
 }
@@ -119,7 +127,7 @@ bintray {
         licenses = ['MIT']
         vcsUrl = 'https://github.com/alphagov/verify-eidas-trust-anchor.git'
         version {
-            name = "$buildVersion"
+            name = buildVersion
         }
     }
 }
