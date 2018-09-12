@@ -84,6 +84,11 @@ test {
 
 task sourceJar(type: Jar) {
     from sourceSets.main.allJava
+    manifest {
+        attributes(
+            'Main-Class': mainClassName
+        )
+    }
     classifier 'sources'
 }
 
