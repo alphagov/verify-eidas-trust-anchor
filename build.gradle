@@ -88,10 +88,6 @@ shadowJar {
     classifier = null
 }
 
-artifacts {
-    archives shadowJar
-}
-
 distributions {
     main {
         baseName = "verify-eidas-trust-anchor"
@@ -107,7 +103,7 @@ publishing {
 
     publications {
         mavenJava(MavenPublication) {
-            from components.java
+            artifact shadowJar
 
             groupId 'uk.gov.ida.eidas'
             artifactId 'trust-anchor'
