@@ -35,10 +35,10 @@ This tool can:
 Build the tool using `gradle`.
 
     # For Unix:
-    ./gradlew build
+    ./gradlew clean build installDist
 
     # For Windows:
-    .\gradlew.bat build
+    .\gradlew.bat clean build installDist
 
 If you make changes, run the tests.
 
@@ -54,13 +54,13 @@ All commands by default will output to standard out. You can pass the `--output 
 
 Generates a country's trust anchor by supplying the location of its metadata and its certificate or multiple certificates if the country has a certificate chain.
 
-    ./verify-trust-anchor trust-anchor import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
 
 ### Sign Trust Anchor with file
 
 Aggregates and signs a collection of trust anchors by using a RSA private key supplied by a file. You can specify as many trust anchors as desired, including none.
 
-    ./verify-trust-anchor trust-anchor sign-with-file \
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor sign-with-file \
       --key path/to/private-key.pk8 \
       --cert path/to/public-cert.crt \
       [country1.jwk [country2.jwk [...]]]
@@ -69,7 +69,7 @@ Aggregates and signs a collection of trust anchors by using a RSA private key su
 
 Aggregates and signs a collection of trust anchors by using a smartcard (such as a Yubikey) that can be accessed using PKCS11.
 
-    ./verify-trust-anchor trust-anchor sign-with-smartcard \
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor sign-with-smartcard \
       --config pkcs11_config.txt \
       --key "Private Key alias" \
       --cert "Public Certificate alias" \
@@ -84,14 +84,14 @@ This requires an external native library, such as [OpenSC](https://github.com/op
 
 Prints the human-readable JSON representation of each signed trust anchor passed, contained in a JSON array. If no signed trust anchors are passed, an empty array is printed.
 
-    ./verify-trust-anchor trust-anchor print [trust-anchor.jwt [...]]
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor print [trust-anchor.jwt [...]]
 
 ### Sign Connector Metadata with file
 
 Signs a metadata.xml file by using private key and its corresponding cert supplied by a file. 
 Supported algorithms "RSA" or "ECDSA".
 
-    ./verify-trust-anchor connector-metadata sign-with-file \
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor connector-metadata sign-with-file \
       --key path/to/private-key.pk8 \
       --cert path/to/public-cert.crt \
       --algorithm ECDSA \
@@ -102,7 +102,7 @@ Supported algorithms "RSA" or "ECDSA".
 Signs a metadata.xml file by using a smartcard (such as a yubikey). 
 Supported algorithms "RSA" or "ECDSA".
 
-    ./verify-trust-anchor connector-metadata sign-with-smartcard \
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor connector-metadata sign-with-smartcard \
       --config pkcs11_config.txt \
       --key "Private Key alias" \
       --cert "Public Certificate alias" \
