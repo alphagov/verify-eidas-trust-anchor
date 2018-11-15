@@ -2,9 +2,4 @@ language: java
 env:
   - VERIFY_USE_PUBLIC_BINARIES=true
 jdk:
-  - oraclejdk8
-  - oraclejdk9
-  - openjdk8
-matrix:
-  allow_failures:
-  - jdk: oraclejdk9
+  - openjdk11

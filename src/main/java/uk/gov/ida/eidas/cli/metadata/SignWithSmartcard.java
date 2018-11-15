@@ -6,6 +6,7 @@ import uk.gov.ida.eidas.utils.keyloader.PKCS11KeyLoader;
 
 import java.io.File;
 import java.security.PrivateKey;
+import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.concurrent.Callable;
 
@@ -25,7 +26,7 @@ public class SignWithSmartcard extends SignMetadata implements Callable<Void> {
 
   @Override
   public Void call() throws Exception {
-    PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, pkcs11Config, password);
+    PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(Security.getProvider("SunPKCS11").getClass(), pkcs11Config, password);
     PrivateKey key = keyLoader.getSigningKey(keyAlias);
     X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
     return build(key, certificate, algorithm);
