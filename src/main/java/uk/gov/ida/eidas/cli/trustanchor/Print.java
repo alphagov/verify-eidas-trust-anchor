@@ -10,6 +10,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import uk.gov.ida.eidas.trustanchor.CountryTrustAnchorValidator;
+import uk.gov.ida.eidas.trustanchor.InvalidTrustAnchorException;
 import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
@@ -36,19 +37,19 @@ class Print implements Callable<Void> {
     public Void call() throws Exception {
         final int INDENT_FACTOR = 4;
         JSONArray anchorObjects = new JSONArray();
-        boolean invalid = false;
+        List<String> invalidFiles = new ArrayList<String>();
 
         for (File anchor : anchors) {
             String encodedJwsObject = FileReader.readFileContent(anchor);
             JSONObject jws = JWSObject.parse(encodedJwsObject).getPayload().toJSONObject();
             List<JWK> keys = JWKSet.parse(jws).getKeys();
             boolean valid = keysAreValid(keys);
-            invalid = invalid || !valid;
+            if (!valid) invalidFiles.add(anchor.getPath());
             anchorObjects.put(jws);
         }
 
         writeOut(this.outputFile, anchorObjects.toString(INDENT_FACTOR));
-        if (invalid) throw new RuntimeException("One or more of the JWKs did not pass validation.");
+        if (!invalidFiles.isEmpty()) throw new InvalidTrustAnchorException("These JWKs did not pass validation:" + String.join(",\n", invalidFiles));
         return null;
     }
 
