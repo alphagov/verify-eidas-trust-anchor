@@ -25,6 +25,8 @@ public class SignWithSmartcard extends SignMetadata implements Callable<Void> {
 
   @Override
   public Void call() throws Exception {
+    SignMetadata.initialize();
+
     PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(sun.security.pkcs11.SunPKCS11.class, pkcs11Config, password);
     PrivateKey key = keyLoader.getSigningKey(keyAlias);
     X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);

@@ -5,15 +5,15 @@ import ch.qos.logback.classic.Logger;
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensaml.core.config.InitializationService;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.slf4j.LoggerFactory;
+
+import uk.gov.ida.eidas.cli.metadata.SignMetadata;
 import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
 import java.io.File;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 
 import static org.junit.Assert.assertFalse;
@@ -30,9 +30,7 @@ public class MetadataSignatureValidatorTest {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.OFF);
 
-        InitializationService.initialize();
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
+        SignMetadata.initialize();
         privateKeyForSigning = FileKeyLoader.loadECKey(new File(Resources.getResource("pki/ecdsa.test.pk8").getFile()));
         certificateForSigning = FileKeyLoader.loadCert(new File(Resources.getResource("pki/ecdsa.test.crt").getFile()));
         wrongCertificate = FileKeyLoader.loadCert(new File(Resources.getResource("pki/diff_ecdsa.test.crt").getFile()));

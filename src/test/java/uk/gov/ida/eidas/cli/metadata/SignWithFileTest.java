@@ -7,7 +7,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.config.InitializationException;
-import org.opensaml.core.config.InitializationService;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
@@ -15,7 +14,6 @@ import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
@@ -37,9 +35,6 @@ public class SignWithFileTest {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.OFF);
 
-        InitializationService.initialize();
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
         keyPath = Resources.getResource("pki/ecdsa.test.pk8").getPath();
         certPath = Resources.getResource("pki/ecdsa.test.crt").getPath();
         wrongCertPath = Resources.getResource("pki/diff_ecdsa.test.crt").getPath();
@@ -55,7 +50,7 @@ public class SignWithFileTest {
     }
 
     @Test
-    public void shouldWriteECDSASignedMetadataToFile() throws IOException, CertificateEncodingException {
+    public void shouldWriteECDSASignedMetadataToFile() throws IOException, CertificateEncodingException, InitializationException {
         CommandLine.call(new SignWithFile(), null,
             "--key=" + keyPath,
             "--cert=" + certPath,
@@ -70,7 +65,7 @@ public class SignWithFileTest {
     }
 
     @Test
-    public void shouldNotWriteToFileOnSigningError() {
+    public void shouldNotWriteToFileOnSigningError() throws InitializationException {
         try {
             CommandLine.call(new SignWithFile(), null,
                 "--key=" + keyPath,
