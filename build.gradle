@@ -61,7 +61,7 @@ dependencies {
             "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version",
             "uk.gov.ida:saml-security:$dependencyVersions.saml_libs_version"
 
-    testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-32',
+    testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-37',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',
             'uk.gov.ida:security-utils:2.0.0-335',
             'org.mockito:mockito-core:2.+',

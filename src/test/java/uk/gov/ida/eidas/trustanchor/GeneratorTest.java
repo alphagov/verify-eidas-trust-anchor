@@ -155,7 +155,7 @@ public class GeneratorTest {
     @Test
     public void shouldThrowWhenDateOfX509CertificateIsInvalid(){
 
-        String expiredCert = TestCertificateStrings.EXPIRED_SELF_SIGNED_SIGNING_PUBLIC_CERT;
+        String expiredCert = TestCertificateStrings.STUB_COUNTRY_PUBLIC_EXPIRED_CERT;
 
         X509Certificate x509Certificate = new X509CertificateFactory().createCertificate(expiredCert);
         RSAPublicKey rsaPublicKey = (RSAPublicKey) x509Certificate.getPublicKey();
