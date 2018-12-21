@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
 public class CountryTrustAnchor {
 
     public static JWK make(List<X509Certificate> certificates, String keyId) {
+        return make(certificates, keyId, true);
+    }
+
+//    This should only be used with `validateKey = false` to generate trust anchors for testing, never for production.
+    public static JWK make(List<X509Certificate> certificates, String keyId, Boolean validateKey) {
 
         if (certificates.isEmpty()) {
             throw new IllegalArgumentException("Certificate list empty");
@@ -40,9 +45,11 @@ public class CountryTrustAnchor {
 
         JWK key = buildJWK(getSupportedKeyType(certificates), keyId, sortedCertificates.get(0), encodedSortedCertChain);
 
-        Collection<String> errors = CountryTrustAnchorValidator.build().findErrors(key);
-        if (!errors.isEmpty()) {
-            throw new IllegalArgumentException(String.format("Managed to generate an invalid anchor: %s", String.join(", ", errors)));
+        if (validateKey) {
+            Collection<String> errors = CountryTrustAnchorValidator.build().findErrors(key);
+            if (!errors.isEmpty()) {
+                throw new IllegalArgumentException(String.format("Managed to generate an invalid anchor: %s", String.join(", ", errors)));
+            }
         }
 
         return key;
