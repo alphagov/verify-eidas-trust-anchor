@@ -1,4 +1,4 @@
-FROM gradle:4.7.0-jdk8 as build
+FROM gradle:5.4.1-jdk11 as build
 
 WORKDIR /trust-anchor
 USER root
@@ -13,7 +13,7 @@ RUN gradle installDist
 
 CMD ["gradle"]
 
-FROM openjdk:8u171-jre
+FROM openjdk:11.0.3-slim-stretch
 
 WORKDIR /trust-anchor
 

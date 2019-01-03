@@ -30,6 +30,11 @@ This tool can:
 * Operate on Connector Metadata
   * sign the metadata using RSA or ECDSA algorithm and validate the signed signature.
 
+## Setup
+
+The trust anchor depends on your system having version 0.17 of Open-SC installed, if you want to use the smart card functionality.
+More info can be found https://github.com/alphagov/verify-metadata/blob/master/README.md#troubleshooting
+
 ## Build
 
 Build the tool using `gradle`.
@@ -79,6 +84,8 @@ This requires an external native library, such as [OpenSC](https://github.com/op
 
     library = /usr/local/lib/opensc-pkcs11.so
     name = opensc
+
+To find out the alias's of the certificates and keys you can use this command `keytool -list -v -keystore NONE -storetype PKCS11 -providerClass sun.security.pkcs11.SunPKCS11 -providerArg pkcs11_config.txt`
 
 ### Print Trust Anchor
 
