@@ -8,7 +8,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.config.InitializationException;
-import org.opensaml.core.config.InitializationService;
 import org.opensaml.core.xml.io.UnmarshallingException;
 import org.opensaml.saml.common.SignableSAMLObject;
 import org.opensaml.xmlsec.signature.Signature;
@@ -16,6 +15,7 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.slf4j.LoggerFactory;
 import uk.gov.ida.common.shared.security.PrivateKeyFactory;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
+import uk.gov.ida.eidas.cli.metadata.SignMetadata;
 import uk.gov.ida.eidas.utils.FileReader;
 import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 import uk.gov.ida.saml.core.test.TestCertificateStrings;
@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 
@@ -47,9 +46,7 @@ public class ConnectorMetadataSignerTest {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.OFF);
 
-        InitializationService.initialize();
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
+        SignMetadata.initialize();
         privateKeyForSigning = FileKeyLoader.loadECKey(new File(Resources.getResource("pki/ecdsa.test.pk8").getFile()));
         certificateForSigning = FileKeyLoader.loadCert(new File(Resources.getResource("pki/ecdsa.test.crt").getFile()));
         unsignedMetadataString = loadMetadataString("metadata/unsigned/metadata.xml");
