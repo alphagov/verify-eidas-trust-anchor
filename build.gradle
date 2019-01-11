@@ -85,6 +85,7 @@ test {
 }
 
 shadowJar {
+    relocate 'org.mockito', 'shadow.org.mockito'
     mergeServiceFiles()
     classifier = null
 }
