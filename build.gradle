@@ -86,6 +86,7 @@ test {
 
 shadowJar {
     relocate 'org.mockito', 'shadow.org.mockito'
+    relocate 'org.assertj', 'shadow.org.assertj'
     mergeServiceFiles()
     classifier = null
 }
