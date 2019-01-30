@@ -1,5 +1,8 @@
-package uk.gov.ida.eidas.cli.metadata;
+package uk.gov.ida.eidas.trustanchor.cli.metadata;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.opensaml.core.config.InitializationException;
+import org.opensaml.core.config.InitializationService;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 import uk.gov.ida.eidas.metadata.AlgorithmType;
@@ -9,9 +12,6 @@ import java.io.File;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.cert.X509Certificate;
-
-import org.opensaml.core.config.InitializationException;
-import org.opensaml.core.config.InitializationService;
 
 public abstract class SignMetadata {
     @Option(names = {"--algorithm"}, description= "Desired algorithm for signing connector metadata. Must be RSA or ECDSA.", required = true)
@@ -25,7 +25,7 @@ public abstract class SignMetadata {
 
     public static void initialize() throws InitializationException {
         InitializationService.initialize();
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
     }
 
     public Void build(PrivateKey key, X509Certificate certificate, AlgorithmType algorithm) throws Exception {

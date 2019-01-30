@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.cli;
+package uk.gov.ida.eidas.trustanchor.cli;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -6,9 +6,9 @@ import org.opensaml.core.config.InitializationException;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
-import uk.gov.ida.eidas.cli.metadata.ConnectorMetadataSigningApplication;
-import uk.gov.ida.eidas.cli.metadata.ProxyNodeMetadataSigningApplication;
-import uk.gov.ida.eidas.cli.trustanchor.TrustAnchorGenerationApplication;
+import uk.gov.ida.eidas.trustanchor.cli.metadata.ProxyNodeMetadataSigningApplication;
+import uk.gov.ida.eidas.trustanchor.cli.metadata.ConnectorMetadataSigningApplication;
+import uk.gov.ida.eidas.trustanchor.cli.trustanchor.TrustAnchorGenerationApplication;
 
 @Command(name="eidas-trust-tool", description="Generates and Signs eIDAS artifacts", subcommands={
     TrustAnchorGenerationApplication.class,

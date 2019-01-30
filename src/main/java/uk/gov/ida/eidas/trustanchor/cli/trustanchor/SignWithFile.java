@@ -1,7 +1,8 @@
-package uk.gov.ida.eidas.cli.metadata;
+package uk.gov.ida.eidas.trustanchor.cli.trustanchor;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
+import uk.gov.ida.eidas.trustanchor.cli.metadata.SignMetadata;
 import uk.gov.ida.eidas.utils.keyloader.FileKeyLoader;
 
 import java.io.File;
