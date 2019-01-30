@@ -7,11 +7,13 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import uk.gov.ida.eidas.cli.metadata.ConnectorMetadataSigningApplication;
+import uk.gov.ida.eidas.cli.metadata.ProxyNodeMetadataSigningApplication;
 import uk.gov.ida.eidas.cli.trustanchor.TrustAnchorGenerationApplication;
 
 @Command(name="eidas-trust-tool", description="Generates and Signs eIDAS artifacts", subcommands={
     TrustAnchorGenerationApplication.class,
-    ConnectorMetadataSigningApplication.class
+    ConnectorMetadataSigningApplication.class,
+    ProxyNodeMetadataSigningApplication.class
 })
 public class Application implements Runnable {
     public static void main(String[] args) throws InitializationException {
