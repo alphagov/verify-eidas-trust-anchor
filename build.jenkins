@@ -20,7 +20,7 @@
             }
             steps {
                 sh 'git config credential.username ${ACCESS_TOKEN_USR} && git config credential.helper "!echo password=\${ACCESS_TOKEN_PSW}; echo"'
-                sh 'git tag -a build_${BUILD_NUMBER} -m "jenkins2 tag build_${BUILD_NUMBER}" && GIT_ASKPASS=true git push origin build_${BUILD_NUMBER}'
+                sh 'git tag -a build_cli_${BUILD_NUMBER} -m "jenkins2 tag build_cli_${BUILD_NUMBER}" && GIT_ASKPASS=true git push origin build_cli_${BUILD_NUMBER}'
             }
         }
 
