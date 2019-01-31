@@ -81,7 +81,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            groupId = "uk.gov.ida.eidas"
+            groupId = "uk.gov.ida.eidas.trustanchor.cli"
             artifact sourceJar
         }
     }
@@ -94,10 +94,10 @@ bintray {
     publish = true
     pkg {
         repo = 'maven-test'
-        name = 'verify-eidas-trust-anchor'
+        name = 'verify-eidas-trust-anchor-cli'
         userOrg = 'alphagov'
         licenses = ['MIT']
-        vcsUrl = 'https://github.com/alphagov/verify-saml-libs.git'
+        vcsUrl = 'https://github.com/alphagov/verify-eidas-trust-anchor.git'
         version {
             name = version
         }
