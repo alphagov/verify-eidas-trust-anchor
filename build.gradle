@@ -1,24 +1,17 @@
 buildscript {
     repositories {
         if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
-            jcenter()
             maven { url "https://dl.bintray.com/alphagov/maven-test" }
-            maven { url "https://dl.bintray.com/robfletcher/gradle-plugins" }
-        }
-        else {
+            jcenter()
+        } else {
             maven { url 'https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/whitelisted-repos/' }
         }
     }
     dependencies {
-        classpath 'org.gradle.plugins:gradle-compass:1.0.7',
-                'uk.gov.ida:ida-gradle:1.1.0-23',
-                'com.github.ben-manes:gradle-versions-plugin:0.11.3',
-                'org.junit.platform:junit-platform-gradle-plugin:1.0.0'
+        classpath 'uk.gov.ida:ida-gradle:1.1.0-23',
+                  'com.github.ben-manes:gradle-versions-plugin:0.20.0'
     }
 }
-
-plugins { id "com.jfrog.bintray" version "1.8.4" }
-plugins { id "com.github.johnrengelman.shadow" version "2.0.4" }
 
 apply plugin: 'java'
 apply plugin: 'com.github.ben-manes.versions'
@@ -27,22 +20,11 @@ apply plugin: 'maven-publish'
 
 mainClassName = 'uk.gov.ida.eidas.cli.Application'
 
-def buildVersion = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
-version = buildVersion
-
-ext {
-    opensaml = '3.3.0'
-}
-
-def dependencyVersions = [
-    opensaml:"$opensaml",
-    saml_libs_version: "$opensaml-158"
-]
-
 repositories {
     if (System.getenv('VERIFY_USE_PUBLIC_BINARIES') == 'true') {
         logger.warn('Production builds MUST NOT be built with public binaries.\nUse artifactory/whitelisted-repos for production builds.\n\n')
         maven { url  'https://dl.bintray.com/alphagov/maven-test' }
+        maven { url 'https://build.shibboleth.net/nexus/content/repositories/releases' }
         jcenter()
     }
     else {
@@ -51,20 +33,13 @@ repositories {
 }
 
 dependencies {
-    compile 'com.nimbusds:nimbus-jose-jwt:5.4',
-            'info.picocli:picocli:2.2.2',
-            'org.json:json:20180130',
-            'com.google.guava:guava:23.1-jre',
-
-            "org.opensaml:opensaml-core:$dependencyVersions.opensaml",
-            "org.opensaml:opensaml-saml-api:$dependencyVersions.opensaml",
-            "uk.gov.ida:saml-serializers:$dependencyVersions.saml_libs_version",
-            "uk.gov.ida:saml-security:$dependencyVersions.saml_libs_version"
+    compile 'info.picocli:picocli:3.9.2',
+            'org.json:json:20180813',
+            "uk.gov.ida:trust-anchor:3.4.0-173"
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-37',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',
-            'uk.gov.ida:security-utils:2.0.0-335',
-            'org.mockito:mockito-core:2.+',
+            'org.mockito:mockito-core:2.23.4',
             'org.assertj:assertj-core:3.9.1'
 
     testRuntime 'org.junit.jupiter:junit-jupiter-engine:5.0.0'
@@ -84,50 +59,27 @@ test {
     }
 }
 
-shadowJar {
-    relocate 'org.mockito', 'shadow.org.mockito'
-    relocate 'org.assertj', 'shadow.org.assertj'
-    mergeServiceFiles()
-    classifier = null
-}
-
-distributions {
-    main {
-        baseName = "verify-eidas-trust-anchor"
-    }
+task sourceJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier "sources"
 }
 
 publishing {
     repositories {
         maven {
-            url '/srv/maven'
+            credentials {
+                username "${System.env.ARTIUSER}"
+                password "${System.env.ARTIPASSWORD}"
+            }
+            url "https://artifactory.ida.digital.cabinet-office.gov.uk/artifactory/libs-release-local"
         }
     }
 
     publications {
         mavenJava(MavenPublication) {
-            artifact shadowJar
-
-            groupId 'uk.gov.ida.eidas'
-            artifactId 'trust-anchor'
-            version buildVersion
-        }
-    }
-}
-
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_API_KEY')
-    publications = ['mavenJava']
-    publish = true
-    pkg {
-        repo = 'maven-test'
-        name = 'verify-eidas-trust-anchor'
-        userOrg = 'alphagov'
-        licenses = ['MIT']
-        vcsUrl = 'https://github.com/alphagov/verify-eidas-trust-anchor.git'
-        version {
-            name = buildVersion
+            from components.java
+            groupId = "uk.gov.ida.eidas"
+            artifact sourceJar
         }
     }
 }

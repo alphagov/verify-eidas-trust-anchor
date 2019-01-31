@@ -1,4 +1,4 @@
-package uk.gov.ida.eidas.cli.metadata;
+package uk.gov.ida.eidas.trustanchor.cli.metadata;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -6,10 +6,10 @@ import com.google.common.io.Resources;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensaml.core.config.InitializationException;
 import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import uk.gov.ida.common.shared.security.X509CertificateFactory;
+import uk.gov.ida.eidas.trustanchor.cli.trustanchor.SignWithFile;
 import uk.gov.ida.eidas.utils.FileReader;
 
 import java.io.File;
@@ -31,7 +31,7 @@ public class SignWithFileTest {
     private String wrongCertPath;
 
     @BeforeEach
-    public void setUp() throws InitializationException {
+    public void setUp() {
         Logger root = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
         root.setLevel(Level.OFF);
 
@@ -50,8 +50,8 @@ public class SignWithFileTest {
     }
 
     @Test
-    public void shouldWriteECDSASignedMetadataToFile() throws IOException, CertificateEncodingException, InitializationException {
-        CommandLine.call(new SignWithFile(), null,
+    public void shouldWriteECDSASignedMetadataToFile() throws IOException, CertificateEncodingException {
+        CommandLine.call(new SignWithFile(),
             "--key=" + keyPath,
             "--cert=" + certPath,
             "--algorithm=ECDSA",
@@ -65,12 +65,12 @@ public class SignWithFileTest {
     }
 
     @Test
-    public void shouldNotWriteToFileOnSigningError() throws InitializationException {
+    public void shouldNotWriteToFileOnSigningError() {
         try {
-            CommandLine.call(new SignWithFile(), null,
+            CommandLine.call(new SignWithFile(),
                 "--key=" + keyPath,
-                "--cert=" + wrongCertPath,
                 "--algorithm=ECDSA",
+                "--cert=" + wrongCertPath,
                 "-o=" + outputFilePath,
                 metadataFilePath
             );

@@ -1,7 +1,8 @@
-package uk.gov.ida.eidas.cli.metadata;
+package uk.gov.ida.eidas.trustanchor.cli.metadata;
 
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
+import uk.gov.ida.eidas.trustanchor.cli.trustanchor.SignWithFile;
 
 @Command(name="connector-metadata", description="Signs Connector Metadata", subcommands={
     SignWithFile.class,
