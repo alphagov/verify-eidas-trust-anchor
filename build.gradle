@@ -13,14 +13,18 @@ buildscript {
     }
 }
 
-plugins { id "com.jfrog.bintray" version "1.8.4" }
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+}
 
 apply plugin: 'java'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'application'
 apply plugin: 'maven-publish'
 
-mainClassName = 'uk.gov.ida.eidas.cli.Application'
+
+mainClassName = 'uk.gov.ida.eidas.trustanchor.cli.Application'
 version = "1.0-${System.env.BUILD_NUMBER ?: 'SNAPSHOT'}"
 
 repositories {
@@ -62,11 +66,6 @@ test {
     }
 }
 
-task sourceJar(type: Jar) {
-    from sourceSets.main.allJava
-    classifier "sources"
-}
-
 publishing {
     repositories {
         maven {
@@ -82,7 +81,7 @@ publishing {
         mavenJava(MavenPublication) {
             from components.java
             groupId = "uk.gov.ida.eidas.trustanchor.cli"
-            artifact sourceJar
+            artifact shadowJar
         }
     }
 }
