@@ -11,13 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 abstract class SignTrustAnchor {
-  @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")
-  private List<File> inputFiles = new ArrayList<>();
+    @Parameters(description = "The JSON Web Key (JWK) files to extract certificates from")
+    private List<File> inputFiles = new ArrayList<>();
 
-  @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = false)
-  private File outputFile;
+    @Option(names = { "-o", "--output" }, description = "File to write the signed trust anchor to", required = false)
+    private File outputFile;
 
-  public Void build(PrivateKey key, X509Certificate certificate) throws Exception {
-    return new SignedTrustAnchorGenerator(key, certificate, inputFiles, outputFile).generate();
-  }
+    public Void build(PrivateKey key, X509Certificate certificate) throws Exception {
+        return new SignedTrustAnchorGenerator(key, certificate, inputFiles, outputFile).generate();
+    }
 }

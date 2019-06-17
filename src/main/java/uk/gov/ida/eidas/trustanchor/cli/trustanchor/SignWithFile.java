@@ -15,18 +15,18 @@ import static uk.gov.ida.eidas.metadata.AlgorithmType.RSA;
 @Command(name="sign-with-file", description="Signs the final key set with a key loaded from a file")
 public class SignWithFile extends SignMetadata implements Callable<Void> {
 
-  @Option(names = { "--key" }, description = "Location of the private key to use for signing", required=true)
-  private File keyFile;
+    @Option(names = { "--key" }, description = "Location of the private key to use for signing", required=true)
+    private File keyFile;
 
-  @Option(names = { "--cert"}, description = "Public signing Certificate", required = true)
-  private File certificateFile;
+    @Option(names = { "--cert"}, description = "Public signing Certificate", required = true)
+    private File certificateFile;
 
-  @Override
-  public Void call() throws Exception {
-    SignMetadata.initialize();
+    @Override
+    public Void call() throws Exception {
+        SignMetadata.initialize();
 
-    PrivateKey key = algorithm == RSA ? FileKeyLoader.loadRSAKey(keyFile) : FileKeyLoader.loadECKey(keyFile);
-    X509Certificate x509Certificate = FileKeyLoader.loadCert(certificateFile);
-    return build(key, x509Certificate, algorithm);
-  }
+        PrivateKey key = algorithm == RSA ? FileKeyLoader.loadRSAKey(keyFile) : FileKeyLoader.loadECKey(keyFile);
+        X509Certificate x509Certificate = FileKeyLoader.loadCert(certificateFile);
+        return build(key, x509Certificate, algorithm);
+    }
 }
