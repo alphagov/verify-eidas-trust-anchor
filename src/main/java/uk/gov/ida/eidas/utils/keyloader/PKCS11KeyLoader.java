@@ -1,8 +1,13 @@
 package uk.gov.ida.eidas.utils.keyloader;
 
 import java.io.IOException;
-import java.security.*;
+import java.security.KeyStore;
 import java.security.KeyStore.PrivateKeyEntry;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.Provider;
+import java.security.UnrecoverableEntryException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -31,11 +36,11 @@ public class PKCS11KeyLoader {
     final PrivateKeyEntry keyEntry = (PrivateKeyEntry)keyStore.getEntry(keyAlias,
             new KeyStore.PasswordProtection(keyPassword.toCharArray()));
     if (keyEntry == null) {
-      throw new RuntimeException("Key store contains wrong kind of credential, need Private key");
+      throw new KeyStoreException("Key store contains wrong kind of credential, need Private key");
     }
     PrivateKey privateKey = keyEntry.getPrivateKey();
     if (privateKey == null) {
-      throw new RuntimeException("Key store didn't contain Private Key");
+      throw new KeyStoreException("Key store didn't contain Private Key");
     }
     return privateKey;
   }
@@ -50,10 +55,10 @@ public class PKCS11KeyLoader {
 
     Certificate certificate = keyStore.getCertificate(alias);
     if (certificate.equals(null)) {
-      throw new RuntimeException(("Certificate not found with alias: " + alias));
+      throw new CertificateException(("Certificate not found with alias: " + alias));
     }
     if (!(certificate instanceof X509Certificate)) {
-      throw new RuntimeException("Certificate is not an X509Certificate");
+      throw new CertificateException("Certificate is not an X509Certificate");
     }
     return (X509Certificate) certificate;
   }
