@@ -79,7 +79,8 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-            groupId = "uk.gov.ida.eidas.trustanchor.cli"
+            groupId = "uk.gov.ida.eidas"
+            artifactId = "trust-anchor.cli"
             artifact shadowJar
         }
     }
