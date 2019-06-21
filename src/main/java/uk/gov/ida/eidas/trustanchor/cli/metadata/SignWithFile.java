@@ -22,8 +22,6 @@ public class SignWithFile extends SignMetadata implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        SignMetadata.initialize();
-
         PrivateKey key = algorithm == RSA ? FileKeyLoader.loadRSAKey(keyFile) : FileKeyLoader.loadECKey(keyFile);
         X509Certificate x509Certificate = FileKeyLoader.loadCert(certificateFile);
         return build(key, x509Certificate, algorithm);

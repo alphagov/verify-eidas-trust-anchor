@@ -2,7 +2,6 @@ package uk.gov.ida.eidas.trustanchor.cli.metadata;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-import uk.gov.ida.eidas.trustanchor.cli.metadata.SignMetadata;
 import uk.gov.ida.eidas.utils.keyloader.PKCS11KeyLoader;
 
 import java.io.File;
@@ -28,14 +27,12 @@ public class SignWithSmartcard extends SignMetadata implements Callable<Void> {
 
     @Override
     public Void call() throws Exception {
-        SignMetadata.initialize();
+         Provider provider = Security.getProvider("SunPKCS11").configure(pkcs11Config.getAbsolutePath());
+         Security.addProvider(provider);
 
-        Provider provider = Security.getProvider("SunPKCS11").configure(pkcs11Config.getAbsolutePath());
-        Security.addProvider(provider);
-
-        PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(provider, password);
-        PrivateKey key = keyLoader.getSigningKey(keyAlias);
-        X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
-        return build(key, certificate, algorithm);
+         PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(provider, password);
+         PrivateKey key = keyLoader.getSigningKey(keyAlias);
+         X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
+         return build(key, certificate, algorithm);
     }
 }
