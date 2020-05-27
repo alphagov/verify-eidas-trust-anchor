@@ -39,6 +39,9 @@ More info can be found https://github.com/alphagov/verify-metadata/blob/master/R
 
 Build the tool using `gradle`.
 
+    # With Docker:
+    docker build . --network host -t verify-eidas-trust-anchor:latest
+
     # For Unix:
     ./gradlew clean build installDist
 
@@ -47,6 +50,11 @@ Build the tool using `gradle`.
 
 If you make changes, run the tests.
 
+    # With Docker:
+    docker build --network=host --target build -t verify-eidas-trust-anchor.test:latest .
+    docker run --network=host verify-eidas-trust-anchor.test:latest gradle test
+
+    # For Unix:
     ./gradlew test
 
 ## Run
@@ -55,17 +63,27 @@ The build process will produce a zip containing the executable (under bin/) unde
  
 All commands by default will output to standard out. You can pass the `--output <file>` or `-o <file>` option to output to a file instead.
 
+Under Docker, you'll want a volume for accessing files on your machine, so use something like:
+
+    docker run --network=host -v /tmp:/host/tmp verify-eidas-trust-anchor:latest <COMMAND> <etc>
+
+Otherwise, use:
+
+    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor <COMMAND> <etc>
+
+Only `<COMMAND>` is shown below.
+
 ### Import Trust Anchor
 
 Generates a country's trust anchor by supplying the location of its metadata and its certificate or multiple certificates if the country has a certificate chain.
 
-    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
+    trust-anchor import "https://metadata.example.com/example-country.xml" path/to/signing.crt [path/to/signing_ca.crt [...]]
 
 ### Sign Trust Anchor with file
 
 Aggregates and signs a collection of trust anchors by using a RSA private key supplied by a file. You can specify as many trust anchors as desired, including none.
 
-    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor sign-with-file \
+    trust-anchor sign-with-file \
       --key path/to/private-key.pk8 \
       --cert path/to/public-cert.crt \
       [country1.jwk [country2.jwk [...]]]
@@ -74,7 +92,7 @@ Aggregates and signs a collection of trust anchors by using a RSA private key su
 
 Aggregates and signs a collection of trust anchors by using a smartcard (such as a Yubikey) that can be accessed using PKCS11.
 
-    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor sign-with-smartcard \
+    trust-anchor sign-with-smartcard \
       --config pkcs11_config.txt \
       --key "Private Key alias" \
       --cert "Public Certificate alias" \
@@ -91,7 +109,7 @@ To find out the alias's of the certificates and keys you can use this command `k
 
 Prints the human-readable JSON representation of each signed trust anchor passed, contained in a JSON array. If no signed trust anchors are passed, an empty array is printed.
 
-    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor trust-anchor print [trust-anchor.jwt [...]]
+    trust-anchor print [trust-anchor.jwt [...]]
 
 ### Sign Connector Metadata with file
 
@@ -109,7 +127,7 @@ Supported algorithms "RSA" or "ECDSA".
 Signs a metadata.xml file by using a smartcard (such as a yubikey). 
 Supported algorithms "RSA" or "ECDSA".
 
-    ./build/install/verify-eidas-trust-anchor/bin/verify-eidas-trust-anchor connector-metadata sign-with-smartcard \
+    connector-metadata sign-with-smartcard \
       --config pkcs11_config.txt \
       --key "Private Key alias" \
       --cert "Public Certificate alias" \
