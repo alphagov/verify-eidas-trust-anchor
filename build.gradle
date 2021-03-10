@@ -8,8 +8,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'uk.gov.ida:ida-gradle:1.1.0-23',
-                  'com.github.ben-manes:gradle-versions-plugin:0.20.0'
+        classpath 'uk.gov.ida:ida-gradle:1.1.0-26',
+                  'com.github.ben-manes:gradle-versions-plugin:0.21.0'
     }
 }
 
@@ -36,12 +36,13 @@ repositories {
     else {
         maven { url 'https://gds.jfrog.io/artifactory/allowed-repos/' }
     }
+    mavenLocal()
 }
 
 dependencies {
     compile 'info.picocli:picocli:3.9.2',
             'org.json:json:20180813',
-            "uk.gov.ida:trust-anchor:3.4.0-173"
+            "uk.gov.ida:saml-lib:3.4.2-205"
 
     testCompile 'uk.gov.ida:ida-dev-pki:1.1.0-37',
             'org.junit.jupiter:junit-jupiter-api:5.0.0',

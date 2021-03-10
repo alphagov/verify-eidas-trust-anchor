@@ -27,12 +27,12 @@ public class SignWithSmartcard extends SignTrustAnchor implements Callable<Void>
 
     @Override
     public Void call() throws Exception {
-        Provider provider = Security.getProvider("SunPKCS11").configure(pkcs11Config.getAbsolutePath());
-        Security.addProvider(provider);
+         Provider provider = Security.getProvider("SunPKCS11").configure(pkcs11Config.getAbsolutePath());
+         Security.addProvider(provider);
 
-        PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(provider , password);
-        PrivateKey key = keyLoader.getSigningKey(keyAlias);
-        X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
-        return build(key, certificate);
+         PKCS11KeyLoader keyLoader = new PKCS11KeyLoader(provider, password);
+         PrivateKey key = keyLoader.getSigningKey(keyAlias);
+         X509Certificate certificate = keyLoader.getPublicCertificate(certAlias);
+         return build(key, certificate);
     }
 }
